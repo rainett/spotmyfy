@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface Callback {
-    String name();
-    String[] params() default {};
+    String callbackName();
+    boolean fromSender() default false;
 }

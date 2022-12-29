@@ -12,6 +12,5 @@ import java.lang.annotation.Target;
 @Component
 public @interface Command {
     String name();
-    String[] params() default {};
     String description() default "ㅤ";
 }

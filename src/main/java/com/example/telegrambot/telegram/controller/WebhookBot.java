@@ -14,7 +14,6 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
-import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
@@ -54,6 +53,7 @@ public class WebhookBot extends SpringWebhookBot {
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         Executable executable = executablesContainer.getExecutable(update);
+        log.info("Executable received {}", executable.getClass().getName());
         List<PartialBotApiMethod<?>> executableResult = executable.run(update);
         executableResult.forEach(this::executeGeneric);
         return null;
@@ -65,6 +65,7 @@ public class WebhookBot extends SpringWebhookBot {
     }
 
     private void executeGeneric(PartialBotApiMethod<?> method) {
+        log.info("Executing bot method {}", method.getClass().getSimpleName());
         for (Method m : this.getClass().getMethods()) {
             if (m.getName().equals("execute") && m.getParameters()[0].getType().equals(method.getClass())) {
                 tryExecuteReflect(method, m);

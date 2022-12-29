@@ -16,7 +16,7 @@ public class TestCommand implements Executable {
     }
 
     private SendMessage prepareMenu(Update update) {
-        return new SendMessage(update.getMessage().getChatId().toString(), "sosi");
+        return new SendMessage(update.getMessage().getChatId().toString(), "yep, i received your command");
     }
 
 }
