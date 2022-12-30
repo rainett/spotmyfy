@@ -1,32 +1,33 @@
 package com.example.telegrambot.telegram.controller.executables.container;
 
+import com.example.telegrambot.telegram.annotations.Executable;
 import com.example.telegrambot.telegram.config.BotConfig;
-import com.example.telegrambot.telegram.controller.executables.Executable;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class ExecutablesContainerImpl implements ExecutablesContainer {
 
     @Getter(AccessLevel.PUBLIC)
-    private final Set<Executable> executables;
+    private final Map<String, Object> executables;
     private final BotConfig botConfig;
 
+    @Autowired
+    public ExecutablesContainerImpl(ApplicationContext appContext, BotConfig botConfig) {
+        this.executables = appContext.getBeansWithAnnotation(Executable.class);
+        this.botConfig = botConfig;
+    }
+
     @Override
-    public Executable getExecutable(Update update) {
-        for (Executable e : executables) {
-            if (e.matches(update, botConfig.getUsername())) {
-                return e;
-            }
-        }
-        return u -> List.of();
+    public Object getExecutable(Update update) {
+        return null;
     }
 
 }

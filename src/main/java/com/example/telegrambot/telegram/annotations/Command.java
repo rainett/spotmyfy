@@ -1,15 +1,6 @@
 package com.example.telegrambot.telegram.annotations;
 
-import org.springframework.stereotype.Component;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Component
+@Executable
 public @interface Command {
     String name();
     String description() default "ㅤ";

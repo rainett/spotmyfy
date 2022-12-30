@@ -1,7 +1,6 @@
 package com.example.telegrambot.bot.commands;
 
 import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.controller.executables.Executable;
 import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboard;
 import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboardRow;
 import com.example.telegrambot.telegram.elements.keyboard.button.ButtonCallback;

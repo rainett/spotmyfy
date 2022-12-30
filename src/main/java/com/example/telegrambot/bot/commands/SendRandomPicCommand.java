@@ -1,7 +1,6 @@
 package com.example.telegrambot.bot.commands;
 
 import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.controller.executables.Executable;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;

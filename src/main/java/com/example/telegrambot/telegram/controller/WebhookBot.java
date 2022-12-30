@@ -2,7 +2,6 @@ package com.example.telegrambot.telegram.controller;
 
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.config.BotConfig;
-import com.example.telegrambot.telegram.controller.executables.Executable;
 import com.example.telegrambot.telegram.controller.executables.container.ExecutablesContainer;
 import lombok.Getter;
 import lombok.Setter;
