@@ -1,6 +1,5 @@
 package com.example.telegrambot.telegram.elements.keyboard;
 
-import com.example.telegrambot.telegram.elements.keyboard.button.MessageKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;

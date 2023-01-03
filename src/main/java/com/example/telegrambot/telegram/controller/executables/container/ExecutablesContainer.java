@@ -1,13 +1,15 @@
 package com.example.telegrambot.telegram.controller.executables.container;
 
+import com.example.telegrambot.telegram.controller.executables.container.key.UpdateKey;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.Set;
+import java.util.Map;
+import java.util.Optional;
 
 public interface ExecutablesContainer {
 
-    Object getExecutable(Update update);
+    Optional<Object> getExecutable(Update update);
 
-    Set<Object> getExecutables();
+    Map<UpdateKey, Object> getExecutables();
 
 }
