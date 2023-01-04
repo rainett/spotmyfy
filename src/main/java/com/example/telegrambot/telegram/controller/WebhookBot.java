@@ -44,20 +44,25 @@ public class WebhookBot extends SpringWebhookBot {
     }
 
     private void setCommandsDescriptions(ExecutablesContainer executablesContainer) {
-        List<BotCommand> commands = executablesContainer.getExecutables().values().stream()
+        List<BotCommand> commands = getBotCommands(executablesContainer);
+        this.tryExecute(new SetMyCommands(commands, new BotCommandScopeDefault(), null));
+    }
+
+    private List<BotCommand> getBotCommands(ExecutablesContainer executablesContainer) {
+        return executablesContainer.getExecutables().values().stream()
                 .filter(exe -> exe.getClass().isAnnotationPresent(Command.class))
+                .filter(exe -> !exe.getClass().getAnnotation(Command.class).hideFromMenu())
                 .map(exe -> new BotCommand(
                         exe.getClass().getAnnotation(Command.class).name(),
                         exe.getClass().getAnnotation(Command.class).description()))
                 .toList();
-        this.tryExecute(new SetMyCommands(commands, new BotCommandScopeDefault(), null));
     }
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         Optional<Object> executableOptional = executablesContainer.getExecutable(update);
         if (executableOptional.isEmpty()) {
-            log.error("No executable was found for update {}, Returning null", update);
+            log.error("No executable was found for update {}, Returning null", update.toString().replaceAll("\\w+=null,? ?", ""));
             return null;
         }
         Object executable = executableOptional.get();
@@ -79,6 +84,8 @@ public class WebhookBot extends SpringWebhookBot {
         return Arrays.stream(executable.getClass().getDeclaredMethods())
                 .filter(m -> m.isAnnotationPresent(Runnable.class))
                 .filter(m -> m.getReturnType().equals(BotMethods.class))
+                .filter(m -> m.getParameterCount() == 1)
+                .filter(m -> m.getParameterTypes()[0].equals(Update.class))
                 .findFirst();
     }
 

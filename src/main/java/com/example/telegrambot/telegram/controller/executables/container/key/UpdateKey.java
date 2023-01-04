@@ -2,8 +2,8 @@ package com.example.telegrambot.telegram.controller.executables.container.key;
 
 import com.example.telegrambot.telegram.annotations.Callback;
 import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.elements.update.CallbackUpdate;
-import com.example.telegrambot.telegram.elements.update.CommandUpdate;
+import com.example.telegrambot.telegram.controller.executables.container.key.update.CallbackUpdate;
+import com.example.telegrambot.telegram.controller.executables.container.key.update.CommandUpdate;
 import com.example.telegrambot.telegram.exceptions.UnknownUpdateException;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -8,4 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Command {
     String name();
     String description() default "ㅤ";
+    boolean hideFromMenu() default false;
 }

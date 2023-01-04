@@ -6,16 +6,19 @@ import com.example.telegrambot.telegram.controller.executables.container.BotMeth
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Command(name = "/deputat", description = "this is my command description")
-public class TestCommand {
+import java.util.concurrent.TimeUnit;
+
+@Command(name = "/sleep", description = "makes me sleep for 5 seconds")
+public class SleepCommand {
 
     @Runnable
     public BotMethods run(Update update) {
-        return BotMethods.of(prepareMessage(update));
-    }
-
-    private SendMessage prepareMessage(Update update) {
-        return new SendMessage(update.getMessage().getChatId().toString(), "yep, i received your command");
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return BotMethods.of(new SendMessage(update.getMessage().getChatId().toString(), "booo!!!"));
     }
 
 }

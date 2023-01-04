@@ -1,6 +1,5 @@
 package com.example.telegrambot.telegram.elements.keyboard;
 
-import com.example.telegrambot.telegram.elements.update.CallbackUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 @AllArgsConstructor
 public class MessageKeyboardButton {
 
-    private CallbackUpdate callback;
+    private ButtonCallback callback;
     private String text;
 
     public InlineKeyboardButton toInlineKeyboardButton() {

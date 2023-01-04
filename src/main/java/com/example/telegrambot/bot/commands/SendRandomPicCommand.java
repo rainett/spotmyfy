@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Command(name = "/pic", description = "sends picture")
+@Command(name = "/pic", description = "sends picture", hideFromMenu = true)
 public class SendRandomPicCommand {
 
     @Runnable
@@ -17,10 +17,7 @@ public class SendRandomPicCommand {
         String messageResponse = "okay, let me send you something...";
         SendMessage sendMessage = new SendMessage(chatId, messageResponse);
         SendPhoto sendPhoto = new SendPhoto(chatId, new InputFile("https://cdn.motor1.com/images/mgl/9Yngp/s1/toyota-all-electric-3te25-towing-tractor.webp"));
-        BotMethods botMethods = new BotMethods();
-        botMethods.addMethod(sendMessage);
-        botMethods.addMethod(sendPhoto);
-        return botMethods;
+        return BotMethods.of(sendMessage, sendPhoto);
     }
 
 }

@@ -1,11 +1,15 @@
-package com.example.telegrambot.telegram.elements.update;
+package com.example.telegrambot.telegram.controller.executables.container.key.update;
 
 import com.example.telegrambot.telegram.annotations.Callback;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Data
+import java.util.Objects;
+
+@Getter
+@Setter
 public class CallbackUpdate {
 
     private String callbackName;
@@ -27,7 +31,16 @@ public class CallbackUpdate {
         return update.hasCallbackQuery();
     }
 
-    public String toCallbackData() {
-        throw new UnsupportedOperationException();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CallbackUpdate that = (CallbackUpdate) o;
+        return (!that.fromSender || fromSender) && Objects.equals(callbackName, that.callbackName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(callbackName);
     }
 }

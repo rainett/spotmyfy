@@ -19,7 +19,7 @@ public class WebhookController {
 
     @PostMapping("/")
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        log.info("Received an update, {}", update);
+        log.info("Received an update, {}", update.toString().replaceAll("\\w+=null,? ?", ""));
         return bot.onWebhookUpdateReceived(update);
     }
 

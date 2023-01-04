@@ -1,4 +1,4 @@
-package com.example.telegrambot.telegram.elements.update;
+package com.example.telegrambot.telegram.controller.executables.container.key.update;
 
 import com.example.telegrambot.telegram.annotations.Command;
 import lombok.Data;
