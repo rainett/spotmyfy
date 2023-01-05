@@ -18,6 +18,6 @@ public class CommandUpdate {
     }
 
     public static boolean updateMatches(Update update) {
-        return update.hasMessage() && update.getMessage().hasText();
+        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().startsWith("/");
     }
 }
