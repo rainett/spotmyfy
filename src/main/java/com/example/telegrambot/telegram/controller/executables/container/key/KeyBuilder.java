@@ -32,6 +32,6 @@ public class KeyBuilder {
                     .callbackUpdate(new CallbackUpdate(update))
                     .build();
         }
-        throw new UnknownUpdateException("Unknown update was passed as a parameter");
+        return null;
     }
 }

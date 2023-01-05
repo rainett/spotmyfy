@@ -18,7 +18,6 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -82,10 +81,9 @@ public class CurrentlyPlayingCommand {
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(chatId);
             sendPhoto.setPhoto(new InputFile(track.getImageUrl()));
-            text = String.format("\uD83C\uDFB5%s — %s\uD83C\uDFB5\n\n[Play in Spotify](%s)",
+            text = String.format("\uD83C\uDFB5%s — %s\uD83C\uDFB5\n\nPlay in Spotify - %s",
                     track.getAuthor(), track.getName(), track.getUrl());
             sendPhoto.setCaption(text);
-            sendPhoto.setParseMode("MarkdownV2");
             return sendPhoto;
         } else {
             SendMessage sendMessage = new SendMessage();

@@ -31,7 +31,7 @@ public class UpdateKey {
         if (isUpdate(value)) {
             return KeyBuilder.ofUpdate((Update) value);
         }
-        throw new UnknownUpdateException("Unknown update was passed as a parameter");
+        return null;
     }
 
     private static boolean isUpdate(Object value) {
