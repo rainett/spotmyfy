@@ -51,7 +51,7 @@ public class UserCode {
 
     public boolean tokenIsValid() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime minusHours = now.minusHours(1);
-        return minusHours.isAfter(lastRefreshed);
+        LocalDateTime timeOfExpiration = lastRefreshed.plusHours(1);
+        return now.isBefore(timeOfExpiration);
     }
 }

@@ -16,11 +16,11 @@ public interface UserCodeRepository extends JpaRepository<UserCode, Long> {
         Optional<String> refreshToken = Optional.ofNullable(authorizationCodeRequest.getRefreshToken());
         UserCode userCode = getByUserId(userId).orElse(new UserCode());
         userCode.setUserId(userId);
-        accessToken.ifPresent(userCode::setAccessToken);
-        refreshToken.ifPresent(t -> {
-            userCode.setRefreshToken(t);
+        accessToken.ifPresent(t -> {
+            userCode.setAccessToken(t);
             userCode.setLastRefreshed(LocalDateTime.now());
         });
+        refreshToken.ifPresent(userCode::setRefreshToken);
         return userCode;
     }
 
