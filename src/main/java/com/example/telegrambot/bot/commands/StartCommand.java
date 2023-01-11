@@ -2,6 +2,7 @@ package com.example.telegrambot.bot.commands;
 
 import com.example.telegrambot.spotify.model.UserCode;
 import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.config.SpotifyConfig;
@@ -36,43 +37,33 @@ public class StartCommand {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         String[] messageSplit = update.getMessage().getText().split(" ");
-
+        String text;
         if (messageSplit.length == 2) {
-            processAuthorizationCode(sendMessage, Long.parseLong(messageSplit[1]), update);
+            text = processAuthorizationCode(Long.parseLong(messageSplit[1]), update);
         } else {
-            sendMessage.setText("Hi! Send me /spotify command to go to authentication");
+            text = "Hi! Send me /spotify command to go to authentication";
         }
-
+        sendMessage.setText(text);
         return BotMethods.of(sendMessage);
     }
 
-    private void processAuthorizationCode(SendMessage sendMessage, Long codeId, Update update) {
+    private String processAuthorizationCode(Long codeId, Update update) {
+        String code = getCode(codeId);
+        SpotifyApi spotifyApi = SpotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
+        AuthorizationCodeCredentials authorizationCodeCredentials = getAuthorizationCodeCredentials(code, spotifyApi);
+        if (authorizationCodeCredentials == null)
+            return "Oops, got an error during your authorization...";
+        Long userId = update.getMessage().getFrom().getId();
+        UserCode userCode = userCodeRepository.getFromRefreshToken(authorizationCodeCredentials, userId);
+        userCodeRepository.save(userCode);
+        return "Logged in successfully!";
+    }
+
+    private String getCode(Long codeId) {
         UserCode codeTemp = userCodeRepository.getReferenceById(codeId);
         String code = codeTemp.getCode();
         userCodeRepository.delete(codeTemp);
-        URI redirectUri = SpotifyHttpManager.makeUri(spotifyConfig.getRedirectUri());
-        SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                .setClientId(spotifyConfig.getClientId())
-                .setClientSecret(spotifyConfig.getClientSecret())
-                .setRedirectUri(redirectUri)
-                .build();
-        AuthorizationCodeCredentials authorizationCodeRequest = getAuthorizationCodeCredentials(code, spotifyApi);
-        if (authorizationCodeRequest == null)
-            return;
-        String accessToken = authorizationCodeRequest.getAccessToken();
-        String refreshToken = authorizationCodeRequest.getRefreshToken();
-        Long userId = update.getMessage().getFrom().getId();
-        UserCode userCode = getUserCode(accessToken, refreshToken, userId);
-        userCodeRepository.save(userCode);
-        sendMessage.setText("Logged in successfully!");
-    }
-
-    private UserCode getUserCode(String accessToken, String refreshToken, Long userId) {
-        UserCode userCode = userCodeRepository.getByUserId(userId).orElse(new UserCode());
-        userCode.setUserId(userId);
-        userCode.setAccessToken(accessToken);
-        userCode.setRefreshToken(refreshToken);
-        return userCode;
+        return code;
     }
 
     private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code, SpotifyApi spotifyApi) {
@@ -82,7 +73,7 @@ public class StartCommand {
                     .build()
                     .execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            log.error("Error executing authorization", e);
+            log.error("Error getting authorization credentials", e);
             return null;
         }
     }

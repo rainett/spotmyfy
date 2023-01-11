@@ -1,8 +1,10 @@
 package com.example.telegrambot.bot.commands;
 
+import com.example.telegrambot.spotify.annotations.TokenRefresh;
 import com.example.telegrambot.spotify.elements.Track;
 import com.example.telegrambot.spotify.model.UserCode;
 import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.controller.executables.container.BotMethods;
@@ -28,6 +30,7 @@ public class CurrentlyPlayingCommand {
 
     private final UserCodeRepository userCodeRepository;
 
+    @TokenRefresh
     @Runnable
     public BotMethods run(Update update) {
         BotMethods botMethods = new BotMethods();
@@ -35,43 +38,30 @@ public class CurrentlyPlayingCommand {
         String chatId = update.getMessage().getChatId().toString();
         Optional<UserCode> userCodeOptional = userCodeRepository.getByUserId(userId);
 
-        BotMethods userIsEmpty = userIsEmpty(botMethods, chatId, userCodeOptional);
-        if (userIsEmpty != null) return userIsEmpty;
+        if (userCodeOptional.isEmpty()) {
+            String text = "Oops! I can't get your currently playing track, maybe you should use /spotify command?";
+            botMethods.addMethod(new SendMessage(chatId, text));
+            return botMethods;
+        }
 
         SpotifyApi spotifyApi = getSpotifyApi(userCodeOptional);
-
         CurrentlyPlaying currentlyPlaying;
         try {
             currentlyPlaying = spotifyApi.getUsersCurrentlyPlayingTrack().build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            catchCurrentTrackError(botMethods, chatId, e);
+            log.error("Error during getting user's currently playing track", e);
+            String text = "Oops! I can't get your currently playing track, maybe you should use /spotify command?";
+            botMethods.addMethod(new SendMessage(chatId, text));
             return botMethods;
         }
         PartialBotApiMethod<?> method = getResponse(chatId, currentlyPlaying);
         return BotMethods.of(method);
     }
 
-    private void catchCurrentTrackError(BotMethods botMethods, String chatId, Exception e) {
-        log.error("Error during getting user's currently playing track", e);
-        String text = "Oops! I can't get your currently playing track, maybe you should use /spotify command?";
-        botMethods.addMethod(new SendMessage(chatId, text));
-    }
-
-    private BotMethods userIsEmpty(BotMethods botMethods, String chatId, Optional<UserCode> userCodeOptional) {
-        if (userCodeOptional.isEmpty()) {
-            String text = "Oops! I can't get your currently playing track, maybe you should use /spotify command?";
-            botMethods.addMethod(new SendMessage(chatId, text));
-            return botMethods;
-        }
-        return null;
-    }
-
     private SpotifyApi getSpotifyApi(Optional<UserCode> userCodeOptional) {
         UserCode userCode = userCodeOptional.orElseThrow();
         String accessToken = userCode.getAccessToken();
-        return SpotifyApi.builder()
-                .setAccessToken(accessToken)
-                .build();
+        return SpotifyApiFactory.getSpotifyApiFromAccessToken(accessToken);
     }
 
     private PartialBotApiMethod<?> getResponse(String chatId, CurrentlyPlaying currentlyPlaying) {

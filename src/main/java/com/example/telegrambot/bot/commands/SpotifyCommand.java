@@ -1,5 +1,6 @@
 package com.example.telegrambot.bot.commands;
 
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.config.SpotifyConfig;
@@ -21,14 +22,7 @@ public class SpotifyCommand {
 
     @Autowired
     public SpotifyCommand(SpotifyConfig spotifyConfig) {
-        URI redirectUri = SpotifyHttpManager.makeUri(spotifyConfig.getRedirectUri());
-
-        SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                .setClientId(spotifyConfig.getClientId())
-                .setClientSecret(spotifyConfig.getClientSecret())
-                .setRedirectUri(redirectUri)
-                .build();
-
+        SpotifyApi spotifyApi = SpotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         this.AUTHORIZATION_CODE_URI_REQUEST =
                 spotifyApi.authorizationCodeUri()
                         .scope(AuthorizationScope.USER_READ_CURRENTLY_PLAYING)

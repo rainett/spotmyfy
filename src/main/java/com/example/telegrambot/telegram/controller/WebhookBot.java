@@ -76,7 +76,8 @@ public class WebhookBot extends SpringWebhookBot {
         }
         Method method = methodOptional.get();
         BotMethods botMethods = invokeMethod(update, executable, method);
-        botMethods.getMethods().forEach(this::executeGeneric);
+        if (botMethods != null)
+            botMethods.getMethods().forEach(this::executeGeneric);
         return null;
     }
 
