@@ -1,6 +1,9 @@
 package com.example.telegrambot.telegram.elements.keyboard;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Arrays;
 
@@ -20,5 +23,22 @@ public class ButtonCallback {
         if (parameters != null)
             Arrays.stream(parameters).forEach(p -> builder.append("?").append(p));
         return builder.toString();
+    }
+
+    public ButtonCallback(Update update) {
+        String[] callbackDataSplit = update.getCallbackQuery().getData().split("\\?");
+        String callbackName = callbackDataSplit[0];
+        String messageSenderId = callbackDataSplit[1];
+        String[] parameters = parseParams(callbackDataSplit);
+        this.callbackName = callbackName;
+        this.messageSenderId = messageSenderId;
+        this.parameters = parameters;
+    }
+
+    private static String[] parseParams(String[] callbackDataSplit) {
+        if (callbackDataSplit.length > 2) {
+            return Arrays.copyOfRange(callbackDataSplit, 2, callbackDataSplit.length);
+        }
+        return null;
     }
 }

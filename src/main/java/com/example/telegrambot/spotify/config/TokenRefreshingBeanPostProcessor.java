@@ -6,6 +6,7 @@ import com.example.telegrambot.spotify.repository.UserCodeRepository;
 import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.config.SpotifyConfig;
 
+import com.example.telegrambot.telegram.controller.WebhookBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,7 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -36,6 +38,7 @@ import java.util.Optional;
 public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
 
     private final UserCodeRepository userCodeRepository;
+    private final WebhookBot bot;
     private final SpotifyConfig spotifyConfig;
 
     @Override
@@ -49,18 +52,24 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
 
     private Object proxyBean(Object bean, Class<?> toProxy) {
         try {
+            Annotation[] declaredAnnotations = Arrays.stream(toProxy.getDeclaredMethods())
+                    .filter(m -> m.isAnnotationPresent(TokenRefresh.class))
+                    .findFirst()
+                    .orElseThrow()
+                    .getDeclaredAnnotations();
+
             return new ByteBuddy()
                     .subclass(toProxy)
                     .annotateType(toProxy.getAnnotations())
                     .method(ElementMatchers.isAnnotatedWith(TokenRefresh.class))
                     .intercept(MethodDelegation.to(new Interceptor())
                             .andThen(SuperMethodCall.INSTANCE))
-                    .annotateMethod(toProxy.getDeclaredMethod("run", Update.class).getDeclaredAnnotations())
+                    .annotateMethod(declaredAnnotations)
                     .make()
                     .load(this.getClass().getClassLoader())
                     .getLoaded()
-                    .getDeclaredConstructor(UserCodeRepository.class)
-                    .newInstance(userCodeRepository);
+                    .getDeclaredConstructor(UserCodeRepository.class, WebhookBot.class)
+                    .newInstance(userCodeRepository, bot);
         } catch (Exception e) {
             log.error("Error searching for a method", e);
             return bean;

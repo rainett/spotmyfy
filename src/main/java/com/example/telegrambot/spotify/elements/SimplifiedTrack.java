@@ -3,27 +3,41 @@ package com.example.telegrambot.spotify.elements;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
+import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class Track {
+public class SimplifiedTrack {
 
     private String name;
     private String author;
     private String imageUrl;
     private String url;
 
-    public Track(CurrentlyPlaying currentlyPlaying) {
+    public SimplifiedTrack(CurrentlyPlaying currentlyPlaying) {
         String currentlyPlayingString = currentlyPlaying.toString();
         this.name = parseName(currentlyPlayingString);
         this.author = parseAuthor(currentlyPlayingString);
         this.imageUrl = parseImage(currentlyPlayingString);
         this.url = parseUrl(currentlyPlayingString);
+    }
+
+    public SimplifiedTrack(Track track) {
+        this.name = track.getName();
+        this.author = Arrays.stream(track.getArtists())
+                .map(ArtistSimplified::getName)
+                .collect(Collectors.joining(", "));
+        this.imageUrl = track.getAlbum().getImages()[0].getUrl();
+        this.url = track.getExternalUrls().get("spotify");
     }
 
     private String parseUrl(String currentlyPlayingString) {

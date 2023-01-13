@@ -2,6 +2,7 @@ package com.example.telegrambot.telegram.config;
 
 import com.example.telegrambot.spotify.config.TokenRefreshingBeanPostProcessor;
 import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.telegram.controller.WebhookBot;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +26,9 @@ public class SpotifyConfig {
     private String redirectUri;
 
     @Bean
-    public TokenRefreshingBeanPostProcessor tokenRefreshingBeanPostProcessor(UserCodeRepository userCodeRepository) {
-        return new TokenRefreshingBeanPostProcessor(userCodeRepository, this);
+    public TokenRefreshingBeanPostProcessor
+    tokenRefreshingBeanPostProcessor(UserCodeRepository userCodeRepository, WebhookBot bot) {
+        return new TokenRefreshingBeanPostProcessor(userCodeRepository, bot, this);
     }
 
 }

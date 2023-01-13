@@ -6,22 +6,18 @@ import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.config.SpotifyConfig;
-import com.example.telegrambot.telegram.controller.executables.container.BotMethods;
+import com.example.telegrambot.telegram.controller.WebhookBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.ParseException;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
-import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Optional;
 
 @Command(name = "/start")
 @RequiredArgsConstructor
@@ -30,9 +26,10 @@ public class StartCommand {
 
     private final UserCodeRepository userCodeRepository;
     private final SpotifyConfig spotifyConfig;
+    private final WebhookBot bot;
 
     @Runnable
-    public BotMethods run(Update update) {
+    public void run(Update update) {
         Long chatId = update.getMessage().getChatId();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -44,7 +41,11 @@ public class StartCommand {
             text = "Hi! Send me /spotify command to go to authentication";
         }
         sendMessage.setText(text);
-        return BotMethods.of(sendMessage);
+        try {
+            bot.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     private String processAuthorizationCode(Long codeId, Update update) {
