@@ -1,16 +1,13 @@
-package com.example.telegrambot.telegram.config;
+package com.example.telegrambot.spotify.config;
 
+import com.example.telegrambot.bot.utils.SpotifyApiFactory;
 import com.example.telegrambot.spotify.config.TokenRefreshingBeanPostProcessor;
-import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.bot.repository.UserRepository;
 import com.example.telegrambot.telegram.controller.WebhookBot;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.SpotifyHttpManager;
-import se.michaelthelin.spotify.enums.AuthorizationScope;
-import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 
 @Configuration
 @Getter
@@ -25,10 +22,15 @@ public class SpotifyConfig {
     @Value("${bot.path}" + "${spotify.redirect_uri}")
     private String redirectUri;
 
+    @Value("${spotify.scopes}")
+    private String[] scopes;
+
     @Bean
-    public TokenRefreshingBeanPostProcessor
-    tokenRefreshingBeanPostProcessor(UserCodeRepository userCodeRepository, WebhookBot bot) {
-        return new TokenRefreshingBeanPostProcessor(userCodeRepository, bot, this);
+    public TokenRefreshingBeanPostProcessor tokenRefreshingBeanPostProcessor(
+            UserRepository userRepository,
+            WebhookBot bot,
+            SpotifyApiFactory spotifyApiFactory) {
+        return new TokenRefreshingBeanPostProcessor(userRepository, bot, this, spotifyApiFactory);
     }
 
 }

@@ -1,11 +1,10 @@
 package com.example.telegrambot.bot.callbacks;
 
 import com.example.telegrambot.bot.callbacks.TopTracksCallbackParams.TrackMessage;
-import com.example.telegrambot.spotify.annotations.TokenRefresh;
+import com.example.telegrambot.bot.repository.UserRepository;
+import com.example.telegrambot.bot.utils.SpotifyApiFactory;
 import com.example.telegrambot.spotify.elements.SimplifiedTrack;
 import com.example.telegrambot.spotify.enums.TimeRange;
-import com.example.telegrambot.spotify.repository.UserCodeRepository;
-import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.telegram.annotations.Callback;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.controller.WebhookBot;
@@ -33,7 +32,6 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -41,15 +39,16 @@ import java.util.List;
 @Slf4j
 public class TopTracksCallback {
 
-    private final UserCodeRepository userCodeRepository;
+    private final UserRepository userRepository;
     private final WebhookBot bot;
+    private final SpotifyApiFactory spotifyApiFactory;
 
-    @TokenRefresh
+
     @Runnable
     public void run(Update update) {
         Long userId = update.getCallbackQuery().getFrom().getId();
         String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
-        String accessToken = userCodeRepository.getByUserId(userId).orElseThrow().getAccessToken();
+        String accessToken = userRepository.getByUserId(userId).orElseThrow().getAccessToken();
 
         ButtonCallback buttonCallback = new ButtonCallback(update);
         TopTracksCallbackParams params = new TopTracksCallbackParams(buttonCallback.getParameters());
@@ -113,7 +112,7 @@ public class TopTracksCallback {
 
     private Paging<Track> getTrackPaging(String accessToken, TopTracksCallbackParams params)
             throws IOException, SpotifyWebApiException, ParseException {
-        SpotifyApi spotifyApi = SpotifyApiFactory.getSpotifyApiFromAccessToken(accessToken);
+        SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromAccessToken(accessToken);
         return spotifyApi.getUsersTopTracks()
                 .time_range(params.getTimeRange().getCode())
                 .limit(params.getLimit())

@@ -1,7 +1,7 @@
 package com.example.telegrambot.spotify;
 
-import com.example.telegrambot.spotify.model.UserCode;
-import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.bot.User;
+import com.example.telegrambot.bot.repository.UserRepository;
 import com.example.telegrambot.telegram.config.BotConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +18,15 @@ import java.io.IOException;
 public class SpotifyController {
 
     private final BotConfig botConfig;
-    private final UserCodeRepository userCodeRepository;
+    private final UserRepository userRepository;
 
     @GetMapping
     public void getCode(HttpServletResponse response, @RequestParam String code) throws IOException {
-        UserCode userCode = new UserCode();
-        userCode.setCode(code);
-        userCodeRepository.save(userCode);
+        User user = new User();
+        user.setCode(code);
+        userRepository.save(user);
         response.sendRedirect("https://t.me/" + botConfig.getUsername().substring(1) +
-                "?start=" + userCode.getId());
+                "?start=" + user.getId());
     }
 
 }

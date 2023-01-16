@@ -2,11 +2,11 @@ package com.example.telegrambot.bot.commands;
 
 import com.example.telegrambot.bot.callbacks.TopTracksCallbackParams;
 import com.example.telegrambot.spotify.enums.TimeRange;
-import com.example.telegrambot.spotify.model.UserCode;
-import com.example.telegrambot.spotify.repository.UserCodeRepository;
+import com.example.telegrambot.bot.User;
+import com.example.telegrambot.bot.repository.UserRepository;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
-import com.example.telegrambot.telegram.controller.WebhookBot;
+import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import com.example.telegrambot.telegram.elements.keyboard.ButtonCallback;
 import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboard;
 import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboardButton;
@@ -26,8 +26,8 @@ import java.util.Optional;
 @Command(name = "/top_tracks")
 public class TopTracksCommand {
 
-    private final UserCodeRepository userCodeRepository;
-    private final WebhookBot bot;
+    private final UserRepository userRepository;
+    private final BotExecutor bot;
     private static final Integer TRACKS_LIMIT = 10;
     private static final Integer TRACKS_OFFSET = 0;
 
@@ -35,14 +35,10 @@ public class TopTracksCommand {
     public void run(Update update) {
         Long userId = update.getMessage().getFrom().getId();
         String chatId = update.getMessage().getChatId().toString();
-        Optional<UserCode> userCodeOptional = userCodeRepository.getByUserId(userId);
+        Optional<User> userCodeOptional = userRepository.getByUserId(userId);
         if (userCodeOptional.isEmpty()) {
             String text = "Hm, i was unable to find you account. Try using /spotify command";
-            try {
-                bot.execute(new SendMessage(chatId, text));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            bot.execute(new SendMessage(chatId, text));
             return;
         }
 
@@ -55,11 +51,7 @@ public class TopTracksCommand {
         topTracksMenu.setChatId(chatId);
         InlineKeyboardMarkup markup = prepareInlineKeyboardMarkup(userId);
         topTracksMenu.setReplyMarkup(markup);
-        try {
-            bot.execute(topTracksMenu);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        bot.execute(topTracksMenu);
     }
 
     private InlineKeyboardMarkup prepareInlineKeyboardMarkup(Long userId) {

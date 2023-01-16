@@ -1,14 +1,17 @@
-package com.example.telegrambot.spotify.utils;
+package com.example.telegrambot.bot.utils;
 
-import com.example.telegrambot.telegram.config.SpotifyConfig;
+import com.example.telegrambot.spotify.config.SpotifyConfig;
+import org.springframework.stereotype.Component;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.net.URI;
 
-public class SpotifyApiFactory {
+@Component
+public class SpotifyApiFactoryImpl implements SpotifyApiFactory {
 
-    public static SpotifyApi getSpotifyApiFromRedirectUri(SpotifyConfig spotifyConfig) {
+    @Override
+    public SpotifyApi getSpotifyApiFromRedirectUri(SpotifyConfig spotifyConfig) {
         URI redirectUri = SpotifyHttpManager.makeUri(spotifyConfig.getRedirectUri());
         return SpotifyApi.builder()
                 .setClientId(spotifyConfig.getClientId())
@@ -17,13 +20,15 @@ public class SpotifyApiFactory {
                 .build();
     }
 
-    public static SpotifyApi getSpotifyApiFromAccessToken(String accessToken) {
+    @Override
+    public SpotifyApi getSpotifyApiFromAccessToken(String accessToken) {
         return SpotifyApi.builder()
                 .setAccessToken(accessToken)
                 .build();
     }
 
-    public static SpotifyApi getSpotifyApiFromRefreshToken(SpotifyConfig spotifyConfig, String refreshToken) {
+    @Override
+    public SpotifyApi getSpotifyApiFromRefreshToken(SpotifyConfig spotifyConfig, String refreshToken) {
         return SpotifyApi.builder()
                 .setClientId(spotifyConfig.getClientId())
                 .setClientSecret(spotifyConfig.getClientSecret())

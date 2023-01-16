@@ -1,10 +1,9 @@
-package com.example.telegrambot.spotify.model;
+package com.example.telegrambot.bot;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
-import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,12 +13,12 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "user_codes",
+@Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(name = "UQ_user_code_user_id", columnNames = "user_id")
         }
 )
-public class UserCode {
+public class User {
 
     @Id
     @GeneratedValue
@@ -40,8 +39,8 @@ public class UserCode {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        UserCode userCode = (UserCode) o;
-        return id != null && Objects.equals(id, userCode.id);
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
     }
 
     @Override

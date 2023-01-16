@@ -9,7 +9,6 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,6 +37,11 @@ public class SimplifiedTrack {
                 .collect(Collectors.joining(", "));
         this.imageUrl = track.getAlbum().getImages()[0].getUrl();
         this.url = track.getExternalUrls().get("spotify");
+    }
+
+    public String toTextMessage() {
+        String format = "\uD83C\uDFB5%s — %s\uD83C\uDFB5\n<a href = \"%s\">Play in Spotify</a>";
+        return String.format(format, author, name, url);
     }
 
     private String parseUrl(String currentlyPlayingString) {
