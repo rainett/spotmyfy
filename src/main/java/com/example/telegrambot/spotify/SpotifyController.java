@@ -1,6 +1,6 @@
 package com.example.telegrambot.spotify;
 
-import com.example.telegrambot.bot.User;
+import com.example.telegrambot.bot.model.User;
 import com.example.telegrambot.bot.repository.UserRepository;
 import com.example.telegrambot.telegram.config.BotConfig;
 import lombok.RequiredArgsConstructor;

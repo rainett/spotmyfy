@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.net.URI;
-
 @RequiredArgsConstructor
 @Command(name = "/spotify")
 public class SpotifyCommand {
@@ -20,11 +18,7 @@ public class SpotifyCommand {
     @Runnable
     public void run(Update update) {
         String chatId = update.getMessage().getChatId().toString();
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        URI uri = authorizationURIService.generateAuthorizationURI();
-        sendMessage.setParseMode("MarkdownV2");
-        sendMessage.setText("[Click me to proceed to Spotify authorization](" + uri.toString() + ")");
+        SendMessage sendMessage = authorizationURIService.generateAuthorizationURI(chatId);
         bot.execute(sendMessage);
     }
 

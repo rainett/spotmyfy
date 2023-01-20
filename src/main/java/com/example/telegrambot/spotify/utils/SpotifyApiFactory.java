@@ -1,4 +1,4 @@
-package com.example.telegrambot.bot.utils;
+package com.example.telegrambot.spotify.utils;
 
 import com.example.telegrambot.spotify.config.SpotifyConfig;
 import se.michaelthelin.spotify.SpotifyApi;

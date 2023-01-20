@@ -1,7 +1,6 @@
 package com.example.telegrambot.telegram.controller.executables.container;
 
 import com.example.telegrambot.telegram.annotations.Executable;
-import com.example.telegrambot.telegram.config.BotConfig;
 import com.example.telegrambot.telegram.controller.executables.container.key.UpdateKey;
 import lombok.AccessLevel;
 import lombok.Getter;

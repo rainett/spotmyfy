@@ -1,11 +1,10 @@
 package com.example.telegrambot.spotify.config;
 
-import com.example.telegrambot.bot.utils.SpotifyApiFactory;
-import com.example.telegrambot.spotify.config.TokenRefreshingBeanPostProcessor;
 import com.example.telegrambot.bot.repository.UserRepository;
-import com.example.telegrambot.telegram.controller.WebhookBot;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,9 +27,10 @@ public class SpotifyConfig {
     @Bean
     public TokenRefreshingBeanPostProcessor tokenRefreshingBeanPostProcessor(
             UserRepository userRepository,
-            WebhookBot bot,
+            ApplicationContext applicationContext,
             SpotifyApiFactory spotifyApiFactory) {
-        return new TokenRefreshingBeanPostProcessor(userRepository, bot, this, spotifyApiFactory);
+        return new TokenRefreshingBeanPostProcessor(userRepository, applicationContext,
+                this, spotifyApiFactory);
     }
 
 }

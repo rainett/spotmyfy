@@ -1,10 +1,9 @@
 package com.example.telegrambot.spotify.config;
 
-import com.example.telegrambot.bot.User;
+import com.example.telegrambot.bot.model.User;
 import com.example.telegrambot.bot.repository.UserRepository;
-import com.example.telegrambot.bot.utils.SpotifyApiFactory;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.spotify.annotations.TokenRefresh;
-import com.example.telegrambot.telegram.controller.WebhookBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
@@ -14,6 +13,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -23,7 +23,10 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Optional;
 
 @Slf4j
@@ -31,7 +34,7 @@ import java.util.Optional;
 public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
 
     private final UserRepository userRepository;
-    private final WebhookBot bot;
+    private final ApplicationContext applicationContext;
     private final SpotifyConfig spotifyConfig;
     private final SpotifyApiFactory spotifyApiFactory;
 
@@ -52,7 +55,7 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
                     .orElseThrow()
                     .getDeclaredAnnotations();
 
-            return new ByteBuddy()
+            Constructor<?> constructor = Arrays.stream(new ByteBuddy()
                     .subclass(toProxy)
                     .annotateType(toProxy.getAnnotations())
                     .method(ElementMatchers.isAnnotatedWith(TokenRefresh.class))
@@ -62,8 +65,15 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
                     .make()
                     .load(this.getClass().getClassLoader())
                     .getLoaded()
-                    .getDeclaredConstructor(WebhookBot.class)
-                    .newInstance(bot);
+                    .getDeclaredConstructors())
+                    .max(Comparator.comparingInt(Constructor::getParameterCount))
+                    .orElseThrow();
+            Parameter[] parameters = constructor.getParameters();
+            Object[] args = new Object[parameters.length];
+            for (int i = 0; i < parameters.length; i++) {
+                args[i] = applicationContext.getBean(parameters[i].getType());
+            }
+            return constructor.newInstance(args);
         } catch (Exception e) {
             log.error("Error searching for a method", e);
             return bean;
@@ -87,6 +97,7 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
 
 
     public class Interceptor {
+        @SuppressWarnings("unused")
         public void refreshToken(Update update) {
             Long userId = getUserId(update);
             Optional<User> userCodeOptional = userRepository.getByUserId(userId);

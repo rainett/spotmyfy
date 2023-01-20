@@ -1,9 +1,8 @@
 package com.example.telegrambot.bot.service.authorization;
 
-import com.example.telegrambot.bot.User;
+import com.example.telegrambot.bot.model.User;
 import com.example.telegrambot.bot.repository.UserRepository;
-import com.example.telegrambot.bot.service.authorization.AuthorizationService;
-import com.example.telegrambot.bot.utils.SpotifyApiFactory;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
 import com.example.telegrambot.spotify.config.SpotifyConfig;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final SpotifyConfig spotifyConfig;
 
     @Override
-    public String authorize(Update update) {
+    public String authorize(Update update) throws AuthorizationFailedException {
         String[] messageSplit = update.getMessage().getText().split(" ");
         if (messageSplit.length == 2) {
             Long codeId = Long.parseLong(messageSplit[1]);
@@ -38,7 +37,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return "Hi! Send me /spotify command to go to authentication";
     }
 
-    private String processAuthorizationCode(Long codeId, Long userId) {
+    private String processAuthorizationCode(Long codeId, Long userId) throws AuthorizationFailedException {
         Optional<User> userOptional = userRepository.findById(codeId);
         if (userOptional.isEmpty()) {
             return "Oops! I can't find your Spotify account. Try using ";
@@ -48,7 +47,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return authorizeUser(userId, user.getCode());
     }
 
-    private String authorizeUser(Long userId, String code) {
+    private String authorizeUser(Long userId, String code) throws AuthorizationFailedException {
         SpotifyApi api = spotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         AuthorizationCodeCredentials credentials = getAuthorizationCodeCredentials(code, api);
         User user = userRepository.getFromCredentials(credentials, userId);
@@ -56,7 +55,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return "Logged in successfully!";
     }
 
-    private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code, SpotifyApi api) {
+    private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code, SpotifyApi api) throws AuthorizationFailedException {
         try {
             return api.authorizationCode(code).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {

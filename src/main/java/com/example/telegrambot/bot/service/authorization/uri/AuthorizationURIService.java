@@ -1,7 +1,7 @@
 package com.example.telegrambot.bot.service.authorization.uri;
 
-import java.net.URI;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 public interface AuthorizationURIService {
-    URI generateAuthorizationURI();
+    SendMessage generateAuthorizationURI(String chatId);
 }

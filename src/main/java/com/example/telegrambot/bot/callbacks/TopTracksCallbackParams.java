@@ -37,6 +37,10 @@ public class TopTracksCallbackParams {
         return parametersList.toArray(String[]::new);
     }
 
+    public boolean hasTrackMessage() {
+        return trackMessage != null;
+    }
+
     public record TrackMessage(Integer trackMessageId, Integer trackMessagesSize){}
 
 }
