@@ -16,7 +16,7 @@ public class CallbackUpdate {
     private boolean fromSender;
 
     public CallbackUpdate(Callback callback) {
-        callbackName = callback.callbackName();
+        callbackName = callback.value();
         fromSender = callback.fromSender();
     }
 

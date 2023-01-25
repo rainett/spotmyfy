@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -100,7 +101,8 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
         @SuppressWarnings("unused")
         public void refreshToken(Update update) {
             Long userId = getUserId(update);
-            Optional<User> userCodeOptional = userRepository.getByUserId(userId);
+            assert userId != null;
+            Optional<User> userCodeOptional = userRepository.findById(userId);
             if (userCodeOptional.isEmpty() || userCodeOptional.get().getRefreshToken() == null) {
                 return;
             }
@@ -114,7 +116,8 @@ public class TokenRefreshingBeanPostProcessor implements BeanPostProcessor {
             AuthorizationCodeRefreshRequest codeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
             try {
                 AuthorizationCodeCredentials codeCredentials = codeRefreshRequest.execute();
-                user = userRepository.getFromCredentials(codeCredentials, userId);
+                user.setAccessToken(codeCredentials.getAccessToken());
+                user.setLastRefreshed(LocalDateTime.now());
                 userRepository.save(user);
             } catch (IOException | SpotifyWebApiException | ParseException e) {
                 log.error("Error during token refresh", e);

@@ -1,21 +1,26 @@
 package com.example.telegrambot.bot.service.authorization;
 
+import com.example.telegrambot.bot.model.AuthorizationCode;
 import com.example.telegrambot.bot.model.User;
+import com.example.telegrambot.bot.repository.AuthorizationCodeRepository;
 import com.example.telegrambot.bot.repository.UserRepository;
-import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
-import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
+import com.example.telegrambot.bot.service.propertymessage.MessageService;
 import com.example.telegrambot.spotify.config.SpotifyConfig;
+import com.example.telegrambot.spotify.exceptions.AuthorizationCodeNotFound;
+import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -23,45 +28,53 @@ import java.util.Optional;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final UserRepository userRepository;
+    private final AuthorizationCodeRepository authorizationCodeRepository;
     private final SpotifyApiFactory spotifyApiFactory;
     private final SpotifyConfig spotifyConfig;
+    private final MessageService messageService;
 
     @Override
-    public String authorize(Update update) throws AuthorizationFailedException {
-        String[] messageSplit = update.getMessage().getText().split(" ");
-        if (messageSplit.length == 2) {
-            Long codeId = Long.parseLong(messageSplit[1]);
-            Long userId = update.getMessage().getFrom().getId();
-            return processAuthorizationCode(codeId, userId);
-        }
-        return "Hi! Send me /spotify command to go to authentication";
+    public SendMessage authorize(Update update)
+            throws AuthorizationFailedException, AuthorizationCodeNotFound {
+        Long chatId = update.getMessage().getChatId();
+        String text = getMessageText(update);
+        return new SendMessage(chatId.toString(), text);
     }
 
-    private String processAuthorizationCode(Long codeId, Long userId) throws AuthorizationFailedException {
-        Optional<User> userOptional = userRepository.findById(codeId);
-        if (userOptional.isEmpty()) {
-            return "Oops! I can't find your Spotify account. Try using ";
+    public String getMessageText(Update update) throws AuthorizationFailedException, AuthorizationCodeNotFound {
+        String[] messageSplit = update.getMessage().getText().split(" ");
+        Long userId = update.getMessage().getFrom().getId();
+        if (messageSplit.length != 2) {
+            return messageService.getMessage("command.start.greeting", userId);
         }
-        User user = userOptional.get();
-        userRepository.delete(user);
-        return authorizeUser(userId, user.getCode());
+        Long codeId = Long.parseLong(messageSplit[1]);
+        return processAuthorizationCode(codeId, userId);
+    }
+
+    private String processAuthorizationCode(Long codeId, Long userId)
+            throws AuthorizationFailedException, AuthorizationCodeNotFound {
+        String errorMessage = "Authorization code with id = [" + userId + "] was not found";
+        AuthorizationCode authorizationCode = authorizationCodeRepository.findById(codeId)
+                .orElseThrow(() -> new AuthorizationCodeNotFound(errorMessage));
+        authorizationCodeRepository.delete(authorizationCode);
+        return authorizeUser(userId, authorizationCode.getCode());
     }
 
     private String authorizeUser(Long userId, String code) throws AuthorizationFailedException {
         SpotifyApi api = spotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         AuthorizationCodeCredentials credentials = getAuthorizationCodeCredentials(code, api);
-        User user = userRepository.getFromCredentials(credentials, userId);
+        User user = new User(userId, credentials.getAccessToken(),
+                credentials.getRefreshToken(), LocalDateTime.now());
         userRepository.save(user);
-        return "Logged in successfully!";
+        return messageService.getMessage("command.start.logged_in", userId);
     }
 
-    private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code, SpotifyApi api) throws AuthorizationFailedException {
+    private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code, SpotifyApi api)
+            throws AuthorizationFailedException {
         try {
             return api.authorizationCode(code).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            String errorMessage = "Error during authorization";
-            log.error(errorMessage, e);
-            throw new AuthorizationFailedException(errorMessage);
+            throw new AuthorizationFailedException();
         }
     }
 

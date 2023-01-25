@@ -47,7 +47,7 @@ public class CurrentlyPlayingServiceImpl implements CurrentlyPlayingService {
 
     private String getAccessToken(Long userId) throws UserNotFoundException {
         return userRepository
-                .getByUserId(userId)
+                .findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id = [" + userId + "] was not found"))
                 .getAccessToken();
     }

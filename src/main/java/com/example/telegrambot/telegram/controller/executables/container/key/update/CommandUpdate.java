@@ -10,7 +10,7 @@ public class CommandUpdate {
     private String commandName;
 
     public CommandUpdate(Command command) {
-        commandName = command.name();
+        commandName = command.value();
     }
 
     public CommandUpdate(Update update) {

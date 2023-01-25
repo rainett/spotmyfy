@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/logs.log/spring.log
+/logs.log/spring.log.2023-01-24.0.gz

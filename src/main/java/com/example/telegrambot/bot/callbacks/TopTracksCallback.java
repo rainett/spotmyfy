@@ -23,7 +23,7 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Callback(callbackName = "top_tracks", fromSender = true)
+@Callback(value = "top_tracks", fromSender = true)
 @Slf4j
 public class TopTracksCallback {
 
@@ -36,17 +36,17 @@ public class TopTracksCallback {
     @Runnable
     public void run(Update update) {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        ButtonCallback buttonCallback = new ButtonCallback(update);
+        Long userId = update.getCallbackQuery().getFrom().getId();
+        ButtonCallback buttonCallback = new ButtonCallback(update.getCallbackQuery());
         TopTracksCallbackParams params = new TopTracksCallbackParams(buttonCallback.getParameters());
         Paging<Track> trackPage;
         try {
-            Long userId = update.getCallbackQuery().getFrom().getId();
             trackPage = service.getTrackPage(userId, params);
         } catch (UserNotFoundException e) {
-            handler.userNotFound(chatId.toString(), e);
+            handler.userNotFound(chatId.toString(), userId, e);
             return;
         } catch (TopTracksException e) {
-            handler.topTracks(chatId.toString(), e);
+            handler.topTracks(chatId.toString(), userId, e);
             return;
         }
         TrackMessage trackMessage = params.getTrackMessage();

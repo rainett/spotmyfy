@@ -3,6 +3,7 @@ package com.example.telegrambot.telegram.elements.keyboard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Arrays;
@@ -25,8 +26,8 @@ public class ButtonCallback {
         return builder.toString();
     }
 
-    public ButtonCallback(Update update) {
-        String[] callbackDataSplit = update.getCallbackQuery().getData().split("\\?");
+    public ButtonCallback(CallbackQuery callbackQuery) {
+        String[] callbackDataSplit = callbackQuery.getData().split("\\?");
         String callbackName = callbackDataSplit[0];
         String messageSenderId = callbackDataSplit[1];
         String[] parameters = parseParams(callbackDataSplit);

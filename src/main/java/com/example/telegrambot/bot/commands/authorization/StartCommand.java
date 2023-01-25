@@ -2,16 +2,18 @@ package com.example.telegrambot.bot.commands.authorization;
 
 import com.example.telegrambot.bot.service.authorization.AuthorizationService;
 import com.example.telegrambot.bot.service.exceptionhandler.ExceptionHandler;
+import com.example.telegrambot.spotify.exceptions.AuthorizationCodeNotFound;
 import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
+import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Command(name = "/start")
+@Command(value = "/start")
 @RequiredArgsConstructor
 @Slf4j
 public class StartCommand {
@@ -22,18 +24,16 @@ public class StartCommand {
 
     @Runnable
     public void run(Update update) {
-        SendMessage sendMessage = new SendMessage();
-        Long chatId = update.getMessage().getChatId();
-        sendMessage.setChatId(chatId);
-        String text;
+        Message message = update.getMessage();
+        String chatId = message.getChatId().toString();
+        Long userId = message.getFrom().getId();
         try {
-            text = authorizationService.authorize(update);
+            bot.execute(authorizationService.authorize(update));
         } catch (AuthorizationFailedException e) {
-            handler.authorizationFailed(chatId.toString(), e);
-            return;
+            handler.authorizationFailed(chatId, userId, e);
+        } catch (AuthorizationCodeNotFound e) {
+            handler.authorizationCodeNotFound(chatId, userId, e);
         }
-        sendMessage.setText(text);
-        bot.execute(sendMessage);
     }
 
 }

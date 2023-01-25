@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Executable
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
-    String name();
+    String value();
     String description() default "ㅤ";
     boolean hideFromMenu() default false;
 }

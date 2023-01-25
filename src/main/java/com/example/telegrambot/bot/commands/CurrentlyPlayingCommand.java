@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
 @Slf4j
-@Command(name = "/currently_playing")
+@Command(value = "/currently_playing")
 public class CurrentlyPlayingCommand {
 
     private final CurrentlyPlayingService currentlyPlayingService;
@@ -30,15 +30,16 @@ public class CurrentlyPlayingCommand {
     public void run(Update update) {
         Message message = update.getMessage();
         String chatId = message.getChatId().toString();
+        Long userId = message.getFrom().getId();
         try {
             SendPhoto sendPhoto = currentlyPlayingService.prepareSendPhoto(message);
             bot.execute(sendPhoto);
         } catch (UserNotFoundException e) {
-            handler.userNotFound(chatId, e);
+            handler.userNotFound(chatId, userId, e);
         } catch (CurrentlyPlayingNotFoundException e) {
-            handler.currentlyPlayingNotFound(chatId, e);
+            handler.currentlyPlayingNotFound(chatId, userId, e);
         } catch (UserNotListeningException e) {
-            handler.userNotListening(chatId);
+            handler.userNotListening(chatId, userId);
         }
 
     }

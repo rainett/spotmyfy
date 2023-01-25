@@ -1,6 +1,6 @@
-package com.example.telegrambot.bot.commands.authorization;
+package com.example.telegrambot.bot.commands;
 
-import com.example.telegrambot.bot.service.authorization.uri.AuthorizationURIService;
+import com.example.telegrambot.bot.service.language.LanguageService;
 import com.example.telegrambot.telegram.annotations.Command;
 import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.controller.executor.BotExecutor;
@@ -9,17 +9,15 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
-@Command(value = "/spotify")
-public class SpotifyCommand {
+@Command("/language")
+public class LanguageCommand {
 
-    private final AuthorizationURIService authorizationURIService;
+    private final LanguageService languageService;
     private final BotExecutor bot;
 
     @Runnable
     public void run(Update update) {
-        String chatId = update.getMessage().getChatId().toString();
-        Long userId = update.getMessage().getFrom().getId();
-        SendMessage sendMessage = authorizationURIService.generateAuthorizationURI(chatId, userId);
+        SendMessage sendMessage = languageService.getChangeLanguageMessage(update.getMessage());
         bot.execute(sendMessage);
     }
 

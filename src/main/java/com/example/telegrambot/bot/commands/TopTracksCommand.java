@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
 @Slf4j
-@Command(name = "/top_tracks")
+@Command(value = "/top_tracks")
 public class TopTracksCommand {
 
     private final TopTracksService topTracksService;

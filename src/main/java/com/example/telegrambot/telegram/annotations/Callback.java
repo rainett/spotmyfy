@@ -6,6 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 @Executable
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Callback {
-    String callbackName();
+    String value();
     boolean fromSender() default false;
 }

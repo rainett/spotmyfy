@@ -6,16 +6,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Getter
 public enum TimeRange {
 
-    LONG("long_term", "all time"),
-    MEDIUM("medium_term", "last 6 months"),
-    SHORT("short_term", "last 4 weeks");
+    LONG("long_term"),
+    MEDIUM("medium_term"),
+    SHORT("short_term");
 
     private final String code;
-    private final String description;
 
-    TimeRange(String code, String time) {
+    TimeRange(String code) {
         this.code = code;
-        this.description = time;
     }
 
     public static TimeRange getByCode(String code) {

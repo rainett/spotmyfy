@@ -46,7 +46,7 @@ public class UpdateProcessor {
                 .filter(exe -> exe.getClass().isAnnotationPresent(Command.class))
                 .filter(exe -> !exe.getClass().getAnnotation(Command.class).hideFromMenu())
                 .map(exe -> new BotCommand(
-                        exe.getClass().getAnnotation(Command.class).name(),
+                        exe.getClass().getAnnotation(Command.class).value(),
                         exe.getClass().getAnnotation(Command.class).description()))
                 .toList();
     }
@@ -85,7 +85,8 @@ public class UpdateProcessor {
         try {
             method.invoke(executable, update);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Error executing method {} on executable {}, {}", method, executable, e.getStackTrace());
+            log.error("Error executing method {} on executable {}", method, executable);
+            log.error("", e);
         }
     }
 

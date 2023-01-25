@@ -1,14 +1,14 @@
 package com.example.telegrambot.bot.service.authorization.uri;
 
-import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
+import com.example.telegrambot.bot.service.propertymessage.MessageService;
 import com.example.telegrambot.spotify.config.SpotifyConfig;
+import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AuthorizationScope;
 
-import java.net.URI;
 import java.util.Arrays;
 
 @RequiredArgsConstructor
@@ -17,21 +17,23 @@ public class AuthorizationURIServiceImpl implements AuthorizationURIService {
 
     private final SpotifyApiFactory spotifyApiFactory;
     private final SpotifyConfig spotifyConfig;
+    private final MessageService messageService;
 
     @Override
-    public SendMessage generateAuthorizationURI(String chatId) {
+    public SendMessage generateAuthorizationURI(String chatId, Long userId) {
         SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         AuthorizationScope[] scopes = Arrays.stream(spotifyConfig.getScopes())
                 .map(AuthorizationScope::keyOf)
                 .toArray(AuthorizationScope[]::new);
-        URI uri = spotifyApi.authorizationCodeUri()
+        String uri = spotifyApi.authorizationCodeUri()
                 .scope(scopes)
                 .build()
-                .execute();
+                .execute().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setParseMode("HTML");
-        sendMessage.setText("[Click me to proceed to Spotify authorization](" + uri.toString() + ")");
+        String text = messageService.getMessage("command.spotify.greeting", userId);
+        sendMessage.setText(String.format("<a href=\"%s\">%s</a>", uri, text));
         return sendMessage;
     }
 }
