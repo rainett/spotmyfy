@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
@@ -35,26 +36,26 @@ public class TopTracksCallback {
     @TokenRefresh
     @Runnable
     public void run(Update update) {
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Long userId = update.getCallbackQuery().getFrom().getId();
-        ButtonCallback buttonCallback = new ButtonCallback(update.getCallbackQuery());
+        CallbackQuery callbackQuery = update.getCallbackQuery();
+        Long userId = callbackQuery.getFrom().getId();
+        ButtonCallback buttonCallback = new ButtonCallback(callbackQuery);
         TopTracksCallbackParams params = new TopTracksCallbackParams(buttonCallback.getParameters());
         Paging<Track> trackPage;
         try {
             trackPage = service.getTrackPage(userId, params);
         } catch (UserNotFoundException e) {
-            handler.userNotFound(chatId.toString(), userId, e);
+            handler.userNotFoundCallback(callbackQuery, e);
             return;
         } catch (TopTracksException e) {
-            handler.topTracks(chatId.toString(), userId, e);
+            handler.topTracksCallback(callbackQuery, e);
             return;
         }
         TrackMessage trackMessage = params.getTrackMessage();
         if (params.hasTrackMessage()) {
-            List<EditMessageMedia> editMediaList = service.getEditMedias(trackPage, trackMessage, chatId);
+            List<EditMessageMedia> editMediaList = service.getEditMedias(trackPage, trackMessage, callbackQuery);
             editMediaList.forEach(bot::execute);
         } else {
-            SendMediaGroup sendMediaGroup = service.getMediaGroup(trackPage, chatId);
+            SendMediaGroup sendMediaGroup = service.getMediaGroup(trackPage, callbackQuery);
             List<Message> messages = bot.execute(sendMediaGroup);
             trackMessage = new TrackMessage(messages.get(0).getMessageId(), messages.size());
         }

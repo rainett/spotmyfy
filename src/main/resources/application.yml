@@ -1,0 +1,28 @@
+bot:
+  username: "@spotmyfy_bot"
+  token: "5827446108:AAFpZcoNuL9Pro93G_O9qmAA3RML1blknA0"
+  path: "https://ca43-193-19-255-254.ngrok.io"
+
+server:
+  port: 8080
+
+spotify:
+  client_id: "19c8e7b681f946abadf1e3afb5f367e1"
+  client_secret: "950a09b31ba94fd4b65808b361eb5d49"
+  redirect_uri: "/spotify"
+  scopes: user-read-currently-playing, user-top-read
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: "postgres"
+    password: "lockheed"
+    url: "jdbc:postgresql://localhost:5432/spotmyfy_db"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  file:
+    path: "logs.log"

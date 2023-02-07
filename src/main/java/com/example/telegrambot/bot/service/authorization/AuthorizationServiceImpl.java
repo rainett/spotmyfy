@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -36,14 +37,19 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Override
     public SendMessage authorize(Update update)
             throws AuthorizationFailedException, AuthorizationCodeNotFound {
-        Long chatId = update.getMessage().getChatId();
-        String text = getMessageText(update);
-        return new SendMessage(chatId.toString(), text);
+        Message message = update.getMessage();
+        Long chatId = message.getChatId();
+        String text = getMessageText(message);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(text);
+        sendMessage.setReplyToMessageId(message.getMessageId());
+        return sendMessage;
     }
 
-    public String getMessageText(Update update) throws AuthorizationFailedException, AuthorizationCodeNotFound {
-        String[] messageSplit = update.getMessage().getText().split(" ");
-        Long userId = update.getMessage().getFrom().getId();
+    public String getMessageText(Message message) throws AuthorizationFailedException, AuthorizationCodeNotFound {
+        String[] messageSplit = message.getText().split(" ");
+        Long userId = message.getFrom().getId();
         if (messageSplit.length != 2) {
             return messageService.getMessage("command.start.greeting", userId);
         }

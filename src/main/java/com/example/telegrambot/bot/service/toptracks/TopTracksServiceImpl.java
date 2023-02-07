@@ -33,6 +33,7 @@ public class TopTracksServiceImpl implements TopTracksService {
         topTracksMenu.setChatId(chatId);
         InlineKeyboardMarkup markup = prepareInlineKeyboardMarkup(userId);
         topTracksMenu.setReplyMarkup(markup);
+        topTracksMenu.setReplyToMessageId(message.getMessageId());
         return topTracksMenu;
     }
 

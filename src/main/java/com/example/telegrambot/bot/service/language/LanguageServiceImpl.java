@@ -31,6 +31,7 @@ public class LanguageServiceImpl implements LanguageService {
         sendMessage.setText(text);
         InlineKeyboardMarkup markup = getInlineKeyboardMarkup(userId);
         sendMessage.setReplyMarkup(markup);
+        sendMessage.setReplyToMessageId(message.getMessageId());
         return sendMessage;
     }
 

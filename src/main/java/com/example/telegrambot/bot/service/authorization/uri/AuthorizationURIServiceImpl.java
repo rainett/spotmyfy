@@ -20,7 +20,7 @@ public class AuthorizationURIServiceImpl implements AuthorizationURIService {
     private final MessageService messageService;
 
     @Override
-    public SendMessage generateAuthorizationURI(String chatId, Long userId) {
+    public SendMessage generateAuthorizationURI(String chatId, Long userId, Integer messageId) {
         SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         AuthorizationScope[] scopes = Arrays.stream(spotifyConfig.getScopes())
                 .map(AuthorizationScope::keyOf)
@@ -34,6 +34,7 @@ public class AuthorizationURIServiceImpl implements AuthorizationURIService {
         sendMessage.setParseMode("HTML");
         String text = messageService.getMessage("command.spotify.greeting", userId);
         sendMessage.setText(String.format("<a href=\"%s\">%s</a>", uri, text));
+        sendMessage.setReplyToMessageId(messageId);
         return sendMessage;
     }
 }

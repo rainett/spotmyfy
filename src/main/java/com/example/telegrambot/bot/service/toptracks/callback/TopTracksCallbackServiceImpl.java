@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
@@ -65,21 +66,23 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
     }
 
     @Override
-    public List<EditMessageMedia> getEditMedias(Paging<Track> trackPage, TrackMessage trackMessage, Long chatId) {
+    public List<EditMessageMedia> getEditMedias(Paging<Track> trackPage,
+                                                TrackMessage trackMessage,
+                                                CallbackQuery callbackQuery) {
         List<EditMessageMedia> editMediaList = new ArrayList<>();
+        Long chatId = callbackQuery.getMessage().getChatId();
+        Long userId = callbackQuery.getFrom().getId();
         int messageId = trackMessage.trackMessageId();
-        int limit = trackMessage.trackMessagesSize();
         StringBuilder stringBuilder = new StringBuilder();
         Track[] tracks = trackPage.getItems();
-        for (int i = 0; i < limit; i++) {
+        for (int i = 0; i < tracks.length; i++) {
             SimplifiedTrack track = new SimplifiedTrack(tracks[i]);
             EditMessageMedia e = new EditMessageMedia();
             e.setChatId(chatId);
             e.setMessageId(i + messageId);
             e.setMedia(new InputMediaPhoto(track.getImageUrl()));
             editMediaList.add(e);
-            int place = trackPage.getOffset() + i + 1;
-            stringBuilder.append(String.format("\n\n№%d ", place)).append(track.toTextMessage());
+            stringBuilder.append(getToAppend(trackPage.getOffset() + i + 1, userId, track));
         }
         InputMedia firstMedia = editMediaList.get(0).getMedia();
         firstMedia.setParseMode("HTML");
@@ -87,25 +90,33 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
         return editMediaList;
     }
 
+    private String getToAppend(int place, Long userId, SimplifiedTrack track) {
+        String messageFormat = messageService.getMessage("element.track.text", userId);
+        String format = "\n\n№%d " + track.formatString(messageFormat);
+        return String.format(format, place);
+    }
+
     @Override
-    public SendMediaGroup getMediaGroup(Paging<Track> trackPage, Long chatId) {
+    public SendMediaGroup getMediaGroup(Paging<Track> trackPage, CallbackQuery callbackQuery) {
+        Long chatId = callbackQuery.getMessage().getChatId();
+        Long userId = callbackQuery.getFrom().getId();
         SendMediaGroup sendMediaGroup = new SendMediaGroup();
         sendMediaGroup.setChatId(chatId);
         List<InputMedia> medias = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         Track[] tracks = trackPage.getItems();
-        for (int i = 0; i < trackPage.getLimit(); i++) {
+        for (int i = 0; i < tracks.length; i++) {
             SimplifiedTrack track = new SimplifiedTrack(tracks[i]);
             InputMediaPhoto photo = new InputMediaPhoto();
             photo.setMedia(track.getImageUrl());
             medias.add(photo);
-            int place = trackPage.getOffset() + i + 1;
-            stringBuilder.append(String.format("\n\n№%d ", place)).append(track.toTextMessage());
+            stringBuilder.append(getToAppend(trackPage.getOffset() + i + 1, userId, track));
         }
         InputMedia firstMedia = medias.get(0);
         firstMedia.setParseMode("HTML");
         firstMedia.setCaption(stringBuilder.toString());
         sendMediaGroup.setMedias(medias);
+        sendMediaGroup.setReplyToMessageId(callbackQuery.getMessage().getMessageId());
         return sendMediaGroup;
     }
 

@@ -9,9 +9,6 @@ import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
@@ -26,18 +23,6 @@ public class CurrentlyPlayingServiceImpl implements CurrentlyPlayingService {
     private final SpotifyApiFactory spotifyApiFactory;
 
     @Override
-    public SendPhoto prepareSendPhoto(Message message) throws UserNotFoundException, CurrentlyPlayingNotFoundException, UserNotListeningException {
-        SendPhoto sendPhoto = new SendPhoto();
-        Long chatId = message.getChatId();
-        Long userId = message.getFrom().getId();
-        sendPhoto.setChatId(chatId);
-        SimplifiedTrack currentlyPlaying = getCurrentlyPlayingTrack(userId);
-        sendPhoto.setPhoto(new InputFile(currentlyPlaying.getImageUrl()));
-        sendPhoto.setParseMode("HTML");
-        sendPhoto.setCaption(currentlyPlaying.toTextMessage());
-        return sendPhoto;
-    }
-
     public SimplifiedTrack getCurrentlyPlayingTrack(Long userId)
             throws UserNotFoundException, CurrentlyPlayingNotFoundException, UserNotListeningException {
         String accessToken = getAccessToken(userId);

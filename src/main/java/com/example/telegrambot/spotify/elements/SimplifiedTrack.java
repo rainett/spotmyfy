@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class SimplifiedTrack {
 
     private String name;
+    private String id;
     private String author;
     private String imageUrl;
     private String url;
@@ -28,20 +29,18 @@ public class SimplifiedTrack {
         this.author = parseAuthor(currentlyPlayingString);
         this.imageUrl = parseImage(currentlyPlayingString);
         this.url = parseUrl(currentlyPlayingString);
+        if (currentlyPlaying.getItem() != null)
+            this.id = currentlyPlaying.getItem().getId();
     }
 
     public SimplifiedTrack(Track track) {
         this.name = track.getName();
+        this.id = track.getId();
         this.author = Arrays.stream(track.getArtists())
                 .map(ArtistSimplified::getName)
                 .collect(Collectors.joining(", "));
         this.imageUrl = track.getAlbum().getImages()[0].getUrl();
         this.url = track.getExternalUrls().get("spotify");
-    }
-
-    public String toTextMessage() {
-        String format = "\uD83C\uDFB5%s — %s\uD83C\uDFB5\n<a href = \"%s\">Play in Spotify</a>";
-        return String.format(format, author, name, url);
     }
 
     private String parseUrl(String currentlyPlayingString) {
@@ -87,5 +86,9 @@ public class SimplifiedTrack {
             return currentlyPlayingString.substring(matcher.start(0) + 5, matcher.end(0) - 1);
         }
         return "None";
+    }
+
+    public String formatString(String format) {
+        return String.format(format, author, name, url);
     }
 }

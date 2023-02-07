@@ -1,17 +1,24 @@
 package com.example.telegrambot.bot.service.exceptionhandler;
 
 import com.example.telegrambot.spotify.exceptions.*;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 public interface ExceptionHandler {
-    void userNotFound(String chatId, Long userId, UserNotFoundException e);
 
-    void currentlyPlayingNotFound(String chatId, Long userId, CurrentlyPlayingNotFoundException e);
+    void userNotFound(Message message, UserNotFoundException e);
 
-    void userNotListening(String chatId, Long userId);
+    void userNotFoundCallback(CallbackQuery callbackQuery, UserNotFoundException e);
 
-    void topTracks(String chatId, Long userId, TopTracksException e);
+    void currentlyPlayingNotFound(Message message, CurrentlyPlayingNotFoundException e);
 
-    void authorizationFailed(String chatId, Long userId, AuthorizationFailedException e);
+    void userNotListening(Message message);
 
-    void authorizationCodeNotFound(String chatId, Long userId, AuthorizationCodeNotFound e);
+    void topTracksCallback(CallbackQuery callbackQuery, TopTracksException e);
+
+    void authorizationCodeNotFound(Message message, AuthorizationCodeNotFound e);
+
+    void authorizationFailed(Message message, AuthorizationFailedException e);
+
+    void audioFeaturesNotFound(Message message, AudioFeaturesNotFoundException e);
 }

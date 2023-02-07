@@ -6,6 +6,7 @@ import com.example.telegrambot.telegram.annotations.Runnable;
 import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
@@ -17,9 +18,11 @@ public class SpotifyCommand {
 
     @Runnable
     public void run(Update update) {
-        String chatId = update.getMessage().getChatId().toString();
-        Long userId = update.getMessage().getFrom().getId();
-        SendMessage sendMessage = authorizationURIService.generateAuthorizationURI(chatId, userId);
+        Message message = update.getMessage();
+        String chatId = message.getChatId().toString();
+        Long userId = message.getFrom().getId();
+        SendMessage sendMessage = authorizationURIService
+                .generateAuthorizationURI(chatId, userId, message.getMessageId());
         bot.execute(sendMessage);
     }
 

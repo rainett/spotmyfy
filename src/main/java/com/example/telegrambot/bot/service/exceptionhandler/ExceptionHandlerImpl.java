@@ -6,7 +6,10 @@ import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,43 +20,77 @@ public class ExceptionHandlerImpl implements ExceptionHandler {
     private final MessageService messageService;
 
     @Override
-    public void userNotFound(String chatId, Long userId, UserNotFoundException e) {
+    public void userNotFound(Message message, UserNotFoundException e) {
         log.error("User was not found", e);
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.user_not_found", userId)));
+        sendReport(message, "exception.user_not_found");
     }
 
     @Override
-    public void currentlyPlayingNotFound(String chatId, Long userId, CurrentlyPlayingNotFoundException e) {
+    public void userNotFoundCallback(CallbackQuery callbackQuery, UserNotFoundException e) {
+        log.error("User was not found", e);
+        sendCallbackReport(callbackQuery, "exception.user_not_found");
+    }
+
+    @Override
+    public void currentlyPlayingNotFound(Message message, CurrentlyPlayingNotFoundException e) {
         log.error("Failed to get user's currently playing track", e);
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.currently_playing_not_found", userId)));
+        sendReport(message, "exception.currently_playing_not_found");
     }
 
     @Override
-    public void userNotListening(String chatId, Long userId) {
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.user_not_listening", userId)));
+    public void userNotListening(Message message) {
+        sendReport(message, "exception.user_not_listening");
     }
 
     @Override
-    public void topTracks(String chatId, Long userId, TopTracksException e) {
+    public void topTracksCallback(CallbackQuery callbackQuery, TopTracksException e) {
         log.error("Failed to get user's top tracks", e);
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.top_tracks", userId)));
+        sendCallbackReport(callbackQuery, "exception.top_tracks");
     }
 
     @Override
-    public void authorizationFailed(String chatId, Long userId, AuthorizationFailedException e) {
+    public void authorizationFailed(Message message, AuthorizationFailedException e) {
         log.error("Failed to perform authorization", e);
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.authorization_failed", userId)));
+        sendReport(message, "exception.authorization_failed");
     }
 
     @Override
-    public void authorizationCodeNotFound(String chatId, Long userId, AuthorizationCodeNotFound e) {
+    public void authorizationCodeNotFound(Message message, AuthorizationCodeNotFound e) {
         log.error("Failed to perform authorization", e);
-        bot.execute(new SendMessage(chatId,
-                messageService.getMessage("exception.authorization_code_not_found", userId)));
+        sendReport(message, "exception.authorization_code_not_found");
     }
+
+    @Override
+    public void audioFeaturesNotFound(Message message, AudioFeaturesNotFoundException e) {
+        log.error("Failed to find audio features", e);
+        sendReport(message, "exception.audio_features_not_found");
+    }
+
+    private void sendReport(Message message, String exceptionCode) {
+        Long chatId = message.getChatId();
+        Long userId = message.getFrom().getId();
+        Integer messageId = message.getMessageId();
+        String text = messageService.getMessage(exceptionCode, userId);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(text);
+        sendMessage.setReplyToMessageId(messageId);
+
+        bot.execute(sendMessage);
+    }
+
+    private void sendCallbackReport(CallbackQuery callbackQuery, String s) {
+        String callbackQueryId = callbackQuery.getId();
+        Long userId = callbackQuery.getFrom().getId();
+        String text = messageService.getMessage(s, userId);
+
+        AnswerCallbackQuery query = new AnswerCallbackQuery();
+        query.setCallbackQueryId(callbackQueryId);
+        query.setText(text);
+        query.setShowAlert(true);
+
+        bot.execute(query);
+    }
+
 }

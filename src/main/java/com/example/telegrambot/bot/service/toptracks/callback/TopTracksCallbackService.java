@@ -7,6 +7,7 @@ import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -17,9 +18,9 @@ public interface TopTracksCallbackService {
 
     Paging<Track> getTrackPage(Long userId, TopTracksCallbackParams params) throws UserNotFoundException, TopTracksException;
 
-    List<EditMessageMedia> getEditMedias(Paging<Track> trackPage, TrackMessage trackMessage, Long chatId);
+    List<EditMessageMedia> getEditMedias(Paging<Track> trackPage, TrackMessage trackMessage, CallbackQuery chatId);
 
-    SendMediaGroup getMediaGroup(Paging<Track> trackPage, Long chatId);
+    SendMediaGroup getMediaGroup(Paging<Track> trackPage, CallbackQuery chatId);
 
     EditMessageText getEditText(Update update, Paging<Track> trackPage, TrackMessage trackMessage);
 }
