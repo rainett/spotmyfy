@@ -1,10 +1,10 @@
 package com.example.telegrambot.bot.callbacks;
 
 import com.example.telegrambot.bot.service.language.callback.LanguageCallbackService;
+import com.rainett.javagram.annotations.Callback;
+import com.rainett.javagram.annotations.Run;
+import com.rainett.javagram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
-import org.rainett.telegram.annotations.Callback;
-import org.rainett.telegram.annotations.Run;
-import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 

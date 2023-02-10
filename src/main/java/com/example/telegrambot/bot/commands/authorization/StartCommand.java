@@ -4,11 +4,11 @@ import com.example.telegrambot.bot.service.authorization.AuthorizationService;
 import com.example.telegrambot.bot.service.exceptionhandler.ExceptionHandler;
 import com.example.telegrambot.spotify.exceptions.AuthorizationCodeNotFound;
 import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
+import com.rainett.javagram.annotations.Command;
+import com.rainett.javagram.annotations.Run;
+import com.rainett.javagram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.rainett.telegram.annotations.Command;
-import org.rainett.telegram.annotations.Run;
-import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 

@@ -2,8 +2,8 @@ package com.example.telegrambot.spotify;
 
 import com.example.telegrambot.bot.model.AuthorizationCode;
 import com.example.telegrambot.bot.repository.AuthorizationCodeRepository;
+import com.rainett.javagram.config.BotConfig;
 import lombok.RequiredArgsConstructor;
-import org.rainett.telegram.config.BotConfig;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

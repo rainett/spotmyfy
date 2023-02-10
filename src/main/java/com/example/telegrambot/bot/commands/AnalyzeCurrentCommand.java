@@ -7,10 +7,10 @@ import com.example.telegrambot.spotify.exceptions.AudioFeaturesNotFoundException
 import com.example.telegrambot.spotify.exceptions.CurrentlyPlayingNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotListeningException;
+import com.rainett.javagram.annotations.Command;
+import com.rainett.javagram.annotations.Run;
+import com.rainett.javagram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
-import org.rainett.telegram.annotations.Command;
-import org.rainett.telegram.annotations.Run;
-import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;

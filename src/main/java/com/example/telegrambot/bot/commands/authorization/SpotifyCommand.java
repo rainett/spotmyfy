@@ -1,10 +1,10 @@
 package com.example.telegrambot.bot.commands.authorization;
 
 import com.example.telegrambot.bot.service.authorization.uri.AuthorizationURIService;
+import com.rainett.javagram.annotations.Command;
+import com.rainett.javagram.annotations.Run;
+import com.rainett.javagram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
-import org.rainett.telegram.annotations.Command;
-import org.rainett.telegram.annotations.Run;
-import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;

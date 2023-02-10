@@ -1,7 +1,7 @@
 bot:
   username: "@spotmyfy_bot"
   token: "5827446108:AAFpZcoNuL9Pro93G_O9qmAA3RML1blknA0"
-  path: "https://ca43-193-19-255-254.ngrok.io"
+  path: "https://4e47-193-19-255-191.ngrok.io"
 
 server:
   port: 8080
