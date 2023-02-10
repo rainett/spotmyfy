@@ -2,9 +2,9 @@ package com.example.telegrambot.bot.service.exceptionhandler;
 
 import com.example.telegrambot.bot.service.propertymessage.MessageService;
 import com.example.telegrambot.spotify.exceptions.*;
-import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.rainett.telegram.controller.executor.BotExecutor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

@@ -70,6 +70,13 @@
 			<artifactId>byte-buddy</artifactId>
 			<version>1.12.21</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.rainett</groupId>
+			<artifactId>mvntest</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

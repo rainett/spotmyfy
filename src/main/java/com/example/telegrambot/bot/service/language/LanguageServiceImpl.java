@@ -1,11 +1,11 @@
 package com.example.telegrambot.bot.service.language;
 
 import com.example.telegrambot.bot.service.propertymessage.MessageService;
-import com.example.telegrambot.telegram.elements.keyboard.ButtonCallback;
-import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboard;
-import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboardButton;
-import com.example.telegrambot.telegram.elements.keyboard.MessageKeyboardRow;
 import lombok.RequiredArgsConstructor;
+import org.rainett.telegram.elements.keyboard.ButtonCallback;
+import org.rainett.telegram.elements.keyboard.MessageKeyboard;
+import org.rainett.telegram.elements.keyboard.MessageKeyboardButton;
+import org.rainett.telegram.elements.keyboard.MessageKeyboardRow;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;

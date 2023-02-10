@@ -1,10 +1,10 @@
 package com.example.telegrambot.bot.commands.authorization;
 
 import com.example.telegrambot.bot.service.authorization.uri.AuthorizationURIService;
-import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.annotations.Runnable;
-import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
+import org.rainett.telegram.annotations.Command;
+import org.rainett.telegram.annotations.Run;
+import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,7 +16,7 @@ public class SpotifyCommand {
     private final AuthorizationURIService authorizationURIService;
     private final BotExecutor bot;
 
-    @Runnable
+    @Run
     public void run(Update update) {
         Message message = update.getMessage();
         String chatId = message.getChatId().toString();

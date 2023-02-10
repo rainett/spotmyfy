@@ -6,12 +6,12 @@ import com.example.telegrambot.bot.service.toptracks.callback.TopTracksCallbackS
 import com.example.telegrambot.spotify.annotations.TokenRefresh;
 import com.example.telegrambot.spotify.exceptions.TopTracksException;
 import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
-import com.example.telegrambot.telegram.annotations.Callback;
-import com.example.telegrambot.telegram.annotations.Runnable;
-import com.example.telegrambot.telegram.controller.executor.BotExecutor;
-import com.example.telegrambot.telegram.elements.keyboard.ButtonCallback;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.rainett.telegram.annotations.Callback;
+import org.rainett.telegram.annotations.Run;
+import org.rainett.telegram.controller.executor.BotExecutor;
+import org.rainett.telegram.elements.keyboard.ButtonCallback;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -34,7 +34,7 @@ public class TopTracksCallback {
 
 
     @TokenRefresh
-    @Runnable
+    @Run
     public void run(Update update) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         Long userId = callbackQuery.getFrom().getId();

@@ -7,10 +7,10 @@ import com.example.telegrambot.spotify.exceptions.AudioFeaturesNotFoundException
 import com.example.telegrambot.spotify.exceptions.CurrentlyPlayingNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotListeningException;
-import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.annotations.Runnable;
-import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
+import org.rainett.telegram.annotations.Command;
+import org.rainett.telegram.annotations.Run;
+import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -24,7 +24,7 @@ public class AnalyzeCurrentCommand {
     private final BotExecutor bot;
 
     @TokenRefresh
-    @Runnable
+    @Run
     public void run(Update update) {
         Message message = update.getMessage();
         try {

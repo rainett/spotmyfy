@@ -4,11 +4,11 @@ import com.example.telegrambot.bot.service.authorization.AuthorizationService;
 import com.example.telegrambot.bot.service.exceptionhandler.ExceptionHandler;
 import com.example.telegrambot.spotify.exceptions.AuthorizationCodeNotFound;
 import com.example.telegrambot.spotify.exceptions.AuthorizationFailedException;
-import com.example.telegrambot.telegram.annotations.Command;
-import com.example.telegrambot.telegram.annotations.Runnable;
-import com.example.telegrambot.telegram.controller.executor.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.rainett.telegram.annotations.Command;
+import org.rainett.telegram.annotations.Run;
+import org.rainett.telegram.controller.executor.BotExecutor;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -21,7 +21,7 @@ public class StartCommand {
     private final ExceptionHandler handler;
     private final BotExecutor bot;
 
-    @Runnable
+    @Run
     public void run(Update update) {
         Message message = update.getMessage();
         try {
