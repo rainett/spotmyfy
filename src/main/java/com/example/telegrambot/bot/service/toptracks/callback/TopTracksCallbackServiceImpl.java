@@ -15,6 +15,7 @@ import com.rainett.javagram.keyboard.MessageKeyboardRow;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -44,9 +45,7 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
     @Override
     public Paging<Track> getTrackPage(Long userId, TopTracksCallbackParams params)
             throws UserNotFoundException, TopTracksException {
-        String accessToken = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id = [" + userId + "] was not found"))
-                .getAccessToken();
+        String accessToken = userRepository.getByUserId(userId).getAccessToken();
         SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromAccessToken(accessToken);
         try {
             return getTrackPaging(params, spotifyApi);
@@ -140,6 +139,17 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
         return editMessageText;
     }
 
+    @Override
+    public AnswerCallbackQuery getNoTracksMessage(CallbackQuery callbackQuery) {
+        Long userId = callbackQuery.getFrom().getId();
+        String text = messageService.getMessage("callback.top_tracks.no_tracks", userId);
+        AnswerCallbackQuery answer = new AnswerCallbackQuery();
+        answer.setCallbackQueryId(callbackQuery.getId());
+        answer.setShowAlert(true);
+        answer.setText(text);
+        return answer;
+    }
+
     private List<MessageKeyboardButton> getButtons(Paging<Track> trackPage,
                                                    ButtonCallback oldCallback,
                                                    TrackMessage trackMessage,
@@ -163,7 +173,7 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
         params.setTrackMessage(trackMessage);
         String callbackName = oldCallback.getCallbackName();
         String messageSenderId = oldCallback.getMessageSenderId();
-        ButtonCallback callback = new ButtonCallback(callbackName, messageSenderId, params.toParameters());
+        ButtonCallback callback = new ButtonCallback(callbackName, messageSenderId, params.toStringArray());
         String buttonText =
                 messageService.getMessage("callback.top_tracks.button.next.text", userId);
         return new MessageKeyboardButton(callback, buttonText);
@@ -180,7 +190,7 @@ public class TopTracksCallbackServiceImpl implements TopTracksCallbackService {
         params.setTrackMessage(trackMessage);
         String callbackName = oldCallback.getCallbackName();
         String messageSenderId = oldCallback.getMessageSenderId();
-        ButtonCallback callback = new ButtonCallback(callbackName, messageSenderId, params.toParameters());
+        ButtonCallback callback = new ButtonCallback(callbackName, messageSenderId, params.toStringArray());
         String buttonText =
                 messageService.getMessage("callback.top_tracks.button.previous.text", userId);
         return new MessageKeyboardButton(callback, buttonText);

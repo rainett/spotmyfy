@@ -8,7 +8,7 @@ import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotListeningException;
 import com.rainett.javagram.annotations.Command;
 import com.rainett.javagram.annotations.Run;
-import com.rainett.javagram.controller.executor.BotExecutor;
+import com.rainett.javagram.controller.executor.sync.BotExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
 @Slf4j
-@Command(value = "/currently_playing")
+@Command(value = "/currently_playing", description = "Shows currently playing track")
 public class CurrentlyPlayingCommand {
 
     private final PlayingService playingService;

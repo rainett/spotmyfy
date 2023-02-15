@@ -15,7 +15,6 @@ import org.apache.hc.core5.http.ParseException;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -26,7 +25,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class AuthorizationServiceImpl implements AuthorizationService {
+public class StartServiceImpl implements StartService {
 
     private final UserRepository userRepository;
     private final AuthorizationCodeRepository authorizationCodeRepository;
@@ -35,9 +34,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final MessageService messageService;
 
     @Override
-    public SendMessage authorize(Update update)
+    public SendMessage start(Message message)
             throws AuthorizationFailedException, AuthorizationCodeNotFound {
-        Message message = update.getMessage();
         Long chatId = message.getChatId();
         String text = getMessageText(message);
         SendMessage sendMessage = new SendMessage();
@@ -47,11 +45,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return sendMessage;
     }
 
-    public String getMessageText(Message message) throws AuthorizationFailedException, AuthorizationCodeNotFound {
+    public String getMessageText(Message message)
+            throws AuthorizationFailedException, AuthorizationCodeNotFound {
         String[] messageSplit = message.getText().split(" ");
         Long userId = message.getFrom().getId();
         if (messageSplit.length != 2) {
-            return messageService.getMessage("command.start.greeting", userId);
+            return userRepository.findById(userId).isPresent()
+                    ? messageService.getMessage("command.start.user_authorized", userId)
+                    : messageService.getMessage("command.start.greeting", userId);
         }
         Long codeId = Long.parseLong(messageSplit[1]);
         return processAuthorizationCode(codeId, userId);

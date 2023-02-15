@@ -2,7 +2,7 @@ package com.example.telegrambot.bot.service.exceptionhandler;
 
 import com.example.telegrambot.bot.service.propertymessage.MessageService;
 import com.example.telegrambot.spotify.exceptions.*;
-import com.rainett.javagram.controller.executor.BotExecutor;
+import com.rainett.javagram.controller.executor.async.BotExecutorAsync;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Component
 public class ExceptionHandlerImpl implements ExceptionHandler {
 
-    private final BotExecutor bot;
+    private final BotExecutorAsync bot;
     private final MessageService messageService;
 
     @Override

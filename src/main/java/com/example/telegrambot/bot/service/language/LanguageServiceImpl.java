@@ -25,13 +25,15 @@ public class LanguageServiceImpl implements LanguageService {
     public SendMessage getChangeLanguageMessage(Message message) {
         Long userId = message.getFrom().getId();
         Long chatId = message.getChatId();
+        String text = messageService.getMessage("command.language.text", userId);
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        String text = messageService.getMessage("command.language.text", userId);
         sendMessage.setText(text);
         InlineKeyboardMarkup markup = getInlineKeyboardMarkup(userId);
         sendMessage.setReplyMarkup(markup);
         sendMessage.setReplyToMessageId(message.getMessageId());
+
         return sendMessage;
     }
 
@@ -48,7 +50,8 @@ public class LanguageServiceImpl implements LanguageService {
                 .forEach(l -> {
                     String callbackName = "language";
                     String[] parameters = new String[]{l.code};
-                    ButtonCallback callback = new ButtonCallback(callbackName, userId.toString(), parameters);
+                    String senderId = userId.toString();
+                    ButtonCallback callback = new ButtonCallback(callbackName, senderId, parameters);
                     MessageKeyboardButton button = new MessageKeyboardButton(callback, l.flag);
                     buttons.add(button);
                 });

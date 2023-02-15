@@ -25,7 +25,7 @@ public class TopTracksCallbackParams {
         }
     }
 
-    public String[] toParameters() {
+    public String[] toStringArray() {
         List<String> parametersList = new ArrayList<>();
         parametersList.add(timeRange.getCode());
         parametersList.add(limit.toString());

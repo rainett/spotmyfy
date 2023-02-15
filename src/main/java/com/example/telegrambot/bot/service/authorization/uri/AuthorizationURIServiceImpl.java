@@ -6,6 +6,7 @@ import com.example.telegrambot.spotify.utils.SpotifyApiFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AuthorizationScope;
 
@@ -20,7 +21,10 @@ public class AuthorizationURIServiceImpl implements AuthorizationURIService {
     private final MessageService messageService;
 
     @Override
-    public SendMessage generateAuthorizationURI(String chatId, Long userId, Integer messageId) {
+    public SendMessage generateAuthorizationURI(Message message) {
+        Long userId = message.getFrom().getId();
+        Long chatId = message.getChatId();
+        Integer messageId = message.getMessageId();
         SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromRedirectUri(spotifyConfig);
         AuthorizationScope[] scopes = Arrays.stream(spotifyConfig.getScopes())
                 .map(AuthorizationScope::keyOf)

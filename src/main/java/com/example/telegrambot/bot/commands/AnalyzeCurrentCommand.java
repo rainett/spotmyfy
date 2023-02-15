@@ -9,26 +9,26 @@ import com.example.telegrambot.spotify.exceptions.UserNotFoundException;
 import com.example.telegrambot.spotify.exceptions.UserNotListeningException;
 import com.rainett.javagram.annotations.Command;
 import com.rainett.javagram.annotations.Run;
-import com.rainett.javagram.controller.executor.BotExecutor;
+import com.rainett.javagram.controller.executor.async.BotExecutorAsync;
 import lombok.RequiredArgsConstructor;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RequiredArgsConstructor
-@Command("/analyze_current")
+@Command(value = "/analyze_current", description = "Analyzes currently playing track")
 public class AnalyzeCurrentCommand {
 
     private final AnalyzeCurrentService analyzeCurrentService;
     private final ExceptionHandler exceptionHandler;
-    private final BotExecutor bot;
+    private final BotExecutorAsync bot;
 
     @TokenRefresh
     @Run
     public void run(Update update) {
         Message message = update.getMessage();
         try {
-            SendPhoto sendPhoto = analyzeCurrentService.getCurrentAnalyze(update.getMessage());
+            SendPhoto sendPhoto = analyzeCurrentService.getCurrentAnalysis(message);
             bot.execute(sendPhoto);
         } catch (UserNotFoundException e) {
             exceptionHandler.userNotFound(message, e);

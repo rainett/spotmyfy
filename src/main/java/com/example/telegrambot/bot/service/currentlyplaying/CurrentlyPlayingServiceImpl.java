@@ -31,10 +31,7 @@ public class CurrentlyPlayingServiceImpl implements CurrentlyPlayingService {
     }
 
     private String getAccessToken(Long userId) throws UserNotFoundException {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id = [" + userId + "] was not found"))
-                .getAccessToken();
+        return userRepository.getByUserId(userId).getAccessToken();
     }
 
     private CurrentlyPlaying getCurrentlyPlaying(String accessToken)

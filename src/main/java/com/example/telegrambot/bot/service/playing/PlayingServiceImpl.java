@@ -22,14 +22,15 @@ public class PlayingServiceImpl implements PlayingService {
     @Override
     public SendPhoto prepareSendPhoto(Message message)
             throws UserNotFoundException, CurrentlyPlayingNotFoundException, UserNotListeningException {
-        SendPhoto sendPhoto = new SendPhoto();
         Long chatId = message.getChatId();
         Long userId = message.getFrom().getId();
-        sendPhoto.setChatId(chatId);
         SimplifiedTrack currentlyPlaying = currentlyPlayingService.getCurrentlyPlayingTrack(userId);
+        String caption = getCaption(userId, currentlyPlaying);
+
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(new InputFile(currentlyPlaying.getImageUrl()));
         sendPhoto.setParseMode("HTML");
-        String caption = getCaption(userId, currentlyPlaying);
         sendPhoto.setCaption(caption);
         sendPhoto.setReplyToMessageId(message.getMessageId());
         return sendPhoto;

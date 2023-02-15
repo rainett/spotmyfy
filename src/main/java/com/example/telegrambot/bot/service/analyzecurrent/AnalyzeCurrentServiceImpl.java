@@ -32,7 +32,7 @@ public class AnalyzeCurrentServiceImpl implements AnalyzeCurrentService {
     private final MessageService messageService;
 
     @Override
-    public SendPhoto getCurrentAnalyze(Message message)
+    public SendPhoto getCurrentAnalysis(Message message)
             throws UserNotFoundException, CurrentlyPlayingNotFoundException,
             UserNotListeningException, AudioFeaturesNotFoundException {
         Long userId = message.getFrom().getId();
@@ -43,30 +43,28 @@ public class AnalyzeCurrentServiceImpl implements AnalyzeCurrentService {
 
     private AudioFeatures getAudioFeatures(String trackId, Long userId)
             throws AudioFeaturesNotFoundException, UserNotFoundException {
-        String accessToken = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id = [" + userId + "] was not found"))
-                .getAccessToken();
+        String accessToken = userRepository.getByUserId(userId).getAccessToken();
         SpotifyApi spotifyApi = spotifyApiFactory.getSpotifyApiFromAccessToken(accessToken);
-        AudioFeatures audioFeatures;
         try {
-            audioFeatures = spotifyApi.getAudioFeaturesForTrack(trackId).build().execute();
+            return spotifyApi.getAudioFeaturesForTrack(trackId).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new AudioFeaturesNotFoundException(e);
         }
-        return audioFeatures;
     }
 
     private SendPhoto getSendPhoto(Message message, SimplifiedTrack track, AudioFeatures audioFeatures) {
+        Integer messageId = message.getMessageId();
         Long chatId = message.getChatId();
         Long userId = message.getFrom().getId();
         String caption = getCaption(track, audioFeatures, userId);
+
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(new InputFile(track.getImageUrl()));
         sendPhoto.setCaption(caption);
         sendPhoto.setParseMode("HTML");
-        sendPhoto.setReplyToMessageId(message.getMessageId());
+        sendPhoto.setReplyToMessageId(messageId);
+
         return sendPhoto;
     }
 

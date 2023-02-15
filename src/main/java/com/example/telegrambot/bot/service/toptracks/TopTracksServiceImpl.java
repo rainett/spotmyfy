@@ -21,19 +21,22 @@ public class TopTracksServiceImpl implements TopTracksService {
 
     private static final Integer TRACKS_LIMIT = 10;
     private static final Integer TRACKS_OFFSET = 0;
+    private static final String CALLBACK_NAME = "top_tracks";
 
     private final MessageService messageService;
 
     public SendMessage prepareMenu(Message message) {
         Long userId = message.getFrom().getId();
         String chatId = message.getChatId().toString();
-        SendMessage topTracksMenu = new SendMessage();
         String messageText = messageService.getMessage("command.top_tracks.greeting", userId);
+        InlineKeyboardMarkup markup = prepareInlineKeyboardMarkup(userId);
+
+        SendMessage topTracksMenu = new SendMessage();
         topTracksMenu.setText(messageText);
         topTracksMenu.setChatId(chatId);
-        InlineKeyboardMarkup markup = prepareInlineKeyboardMarkup(userId);
         topTracksMenu.setReplyMarkup(markup);
         topTracksMenu.setReplyToMessageId(message.getMessageId());
+
         return topTracksMenu;
     }
 
@@ -45,37 +48,23 @@ public class TopTracksServiceImpl implements TopTracksService {
     }
 
     private List<MessageKeyboardButton> prepareMessageKeyboardButtons(Long userId) {
-        TopTracksCallbackParams longParams =
-                new TopTracksCallbackParams(TimeRange.LONG, TRACKS_LIMIT, TRACKS_OFFSET, null);
-        TopTracksCallbackParams mediumParams =
-                new TopTracksCallbackParams(TimeRange.MEDIUM, TRACKS_LIMIT, TRACKS_OFFSET, null);
-        TopTracksCallbackParams shortParams =
-                new TopTracksCallbackParams(TimeRange.SHORT, TRACKS_LIMIT, TRACKS_OFFSET, null);
-
-
-        String callbackName = "top_tracks";
-        String messageSenderId = userId.toString();
-        ButtonCallback longRangeButtonCallback =
-                new ButtonCallback(callbackName, messageSenderId, longParams.toParameters());
-        ButtonCallback mediumRangeButtonCallback =
-                new ButtonCallback(callbackName, messageSenderId, mediumParams.toParameters());
-        ButtonCallback shortRangeButtonCallback =
-                new ButtonCallback(callbackName, messageSenderId, shortParams.toParameters());
-
-        String longText =
-                messageService.getMessage("callback.top_tracks.button.range.long.text", userId);
-        String mediumText =
-                messageService.getMessage("callback.top_tracks.button.range.medium.text", userId);
-        String shortText =
-                messageService.getMessage("callback.top_tracks.button.range.short.text", userId);
-
         MessageKeyboardButton longRangeButton =
-                new MessageKeyboardButton(longRangeButtonCallback, longText);
+                getButton(TimeRange.LONG, userId, "callback.top_tracks.button.range.long.text");
         MessageKeyboardButton mediumRangeButton =
-                new MessageKeyboardButton(mediumRangeButtonCallback, mediumText);
+                getButton(TimeRange.MEDIUM, userId, "callback.top_tracks.button.range.medium.text");
         MessageKeyboardButton shortRangeButton =
-                new MessageKeyboardButton(shortRangeButtonCallback, shortText);
+                getButton(TimeRange.SHORT, userId, "callback.top_tracks.button.range.short.text");
 
         return List.of(longRangeButton, mediumRangeButton, shortRangeButton);
+    }
+
+    private MessageKeyboardButton getButton(TimeRange timeRange, Long userId, String textCode) {
+        TopTracksCallbackParams params =
+                new TopTracksCallbackParams(timeRange, TRACKS_LIMIT, TRACKS_OFFSET, null);
+        String messageSenderId = userId.toString();
+        ButtonCallback buttonCallback =
+                new ButtonCallback(CALLBACK_NAME, messageSenderId, params.toStringArray());
+        String text = messageService.getMessage(textCode, userId);
+        return new MessageKeyboardButton(buttonCallback, text);
     }
 }

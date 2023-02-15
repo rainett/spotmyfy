@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public interface AnalyzeCurrentService {
-    SendPhoto getCurrentAnalyze(Message message)
+    SendPhoto getCurrentAnalysis(Message message)
             throws UserNotFoundException, CurrentlyPlayingNotFoundException,
             UserNotListeningException, AudioFeaturesNotFoundException;
 }
